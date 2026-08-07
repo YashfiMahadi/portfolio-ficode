@@ -1,0 +1,85 @@
+package com.portfolio.app.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+
+/**
+ * Project Entity - Menyimpan data proyek yang pernah dikerjakan
+ * Konsep OOP: Encapsulation, Entity
+ */
+@Entity
+@Table(name = "projects")
+public class Project {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @NotBlank(message = "Nama proyek tidak boleh kosong")
+    @Column(nullable = false)
+    private String namaProyek;
+
+    @Column(length = 1000)
+    private String deskripsi;
+
+    private String teknologiDigunakan; // contoh: "Java, Spring Boot, MySQL, React"
+
+    private String tanggalMulai;
+    private String tanggalSelesai;
+
+    private String linkGithub;
+    private String linkDemo;
+    private String gambarUrl;
+
+    private String kategori; // Web, Mobile, Desktop, Data Science, dll
+
+    private String statusProyek; // Selesai, Dalam Pengerjaan, Ditangguhkan
+
+    // ===== Constructor =====
+    public Project() {}
+
+    public Project(String namaProyek, String deskripsi, String teknologiDigunakan) {
+        this.namaProyek = namaProyek;
+        this.deskripsi = deskripsi;
+        this.teknologiDigunakan = teknologiDigunakan;
+    }
+
+    // ===== Getter & Setter =====
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getNamaProyek() { return namaProyek; }
+    public void setNamaProyek(String namaProyek) { this.namaProyek = namaProyek; }
+
+    public String getDeskripsi() { return deskripsi; }
+    public void setDeskripsi(String deskripsi) { this.deskripsi = deskripsi; }
+
+    public String getTeknologiDigunakan() { return teknologiDigunakan; }
+    public void setTeknologiDigunakan(String teknologiDigunakan) { this.teknologiDigunakan = teknologiDigunakan; }
+
+    public String getTanggalMulai() { return tanggalMulai; }
+    public void setTanggalMulai(String tanggalMulai) { this.tanggalMulai = tanggalMulai; }
+
+    public String getTanggalSelesai() { return tanggalSelesai; }
+    public void setTanggalSelesai(String tanggalSelesai) { this.tanggalSelesai = tanggalSelesai; }
+
+    public String getLinkGithub() { return linkGithub; }
+    public void setLinkGithub(String linkGithub) { this.linkGithub = linkGithub; }
+
+    public String getLinkDemo() { return linkDemo; }
+    public void setLinkDemo(String linkDemo) { this.linkDemo = linkDemo; }
+
+    public String getGambarUrl() { return gambarUrl; }
+    public void setGambarUrl(String gambarUrl) { this.gambarUrl = gambarUrl; }
+
+    public String getKategori() { return kategori; }
+    public void setKategori(String kategori) { this.kategori = kategori; }
+
+    public String getStatusProyek() { return statusProyek; }
+    public void setStatusProyek(String statusProyek) { this.statusProyek = statusProyek; }
+
+    @Override
+    public String toString() {
+        return "Project{id=" + id + ", nama='" + namaProyek + "', status='" + statusProyek + "'}";
+    }
+}
