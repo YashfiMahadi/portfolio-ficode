@@ -15,14 +15,14 @@ export default function UserDropdown() {
 
   const user = auth.getUser();
 
-   useEffect(() => {
-    if (!user) return;
+  useEffect(() => {
+    if (!user?.id) return;
     profileAPI.getMyProfile(user.id).then(res => {
       if (res.status === "success" && res.data) {
         setProfile(res.data);
       }
     }).catch(() => {});
-  });
+  }, [user?.id]);
 
   function toggleDropdown(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
     e.stopPropagation();
