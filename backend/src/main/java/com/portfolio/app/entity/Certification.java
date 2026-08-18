@@ -16,18 +16,26 @@ public class Certification {
     private Long id;
 
     @NotBlank(message = "Nama sertifikat tidak boleh kosong")
-    @Column(nullable = false)
+    @Column(name = "nama_sertifikat", nullable = false) // Sesuaikan
     private String namaSertifikat;
 
     @NotBlank(message = "Penerbit tidak boleh kosong")
+    @Column(nullable = false)
     private String penerbit; // contoh: "Oracle", "Google", "Udemy"
 
+    @Column(name = "tanggal_terbit") // Sesuaikan
     private String tanggalTerbit;
+
+    @Column(name = "tanggal_kadaluarsa") // Sesuaikan
     private String tanggalKadaluarsa; // opsional, bisa null jika tidak kadaluarsa
 
+    @Column(name = "nomor_sertifikat") // Sesuaikan
     private String nomorSertifikat;
+
+    @Column(name = "link_sertifikat") // Sesuaikan
     private String linkSertifikat; // link verifikasi online
 
+    @Column(name = "kategori")
     private String kategori; // Programming, Cloud, Database, Design, dll
 
     // ===== Constructor =====

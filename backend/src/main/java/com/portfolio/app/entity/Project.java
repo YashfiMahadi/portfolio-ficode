@@ -16,23 +16,34 @@ public class Project {
     private Long id;
 
     @NotBlank(message = "Nama proyek tidak boleh kosong")
-    @Column(nullable = false)
+    @Column(name = "nama_proyek", nullable = false) // Sesuaikan
     private String namaProyek;
 
-    @Column(length = 1000)
+    @Column(name = "deskripsi", length = 1000)
     private String deskripsi;
 
+    @Column(name = "teknologi_digunakan") // Sesuaikan
     private String teknologiDigunakan; // contoh: "Java, Spring Boot, MySQL, React"
 
+    @Column(name = "tanggal_mulai") // Sesuaikan
     private String tanggalMulai;
+
+    @Column(name = "tanggal_selesai") // Sesuaikan
     private String tanggalSelesai;
 
+    @Column(name = "link_github") // Sesuaikan
     private String linkGithub;
+
+    @Column(name = "link_demo") // Sesuaikan
     private String linkDemo;
+
+    @Column(name = "gambar_url") // Sesuaikan
     private String gambarUrl;
 
+    @Column(name = "kategori")
     private String kategori; // Web, Mobile, Desktop, Data Science, dll
 
+    @Column(name = "status_proyek") // Sesuaikan
     private String statusProyek; // Selesai, Dalam Pengerjaan, Ditangguhkan
 
     // ===== Constructor =====

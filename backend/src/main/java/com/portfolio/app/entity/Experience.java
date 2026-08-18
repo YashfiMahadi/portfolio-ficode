@@ -16,18 +16,26 @@ public class Experience {
     private Long id;
 
     @NotBlank(message = "Nama perusahaan tidak boleh kosong")
+    @Column(name = "nama_perusahaan", nullable = false)
     private String namaPerusahaan;
 
     @NotBlank(message = "Posisi/jabatan tidak boleh kosong")
+    @Column(nullable = false)
     private String posisi;
 
+    @Column(name = "lokasi_perusahaan")
     private String lokasiPerusahaan;
-    private String tanggalMulai;  // format: "2022-01"
-    private String tanggalSelesai; // format: "2024-06" atau "Sekarang"
 
-    @Column(length = 1000)
+    @Column(name = "tanggal_mulai") // format: "2022-01"
+    private String tanggalMulai;  
+
+    @Column(name = "tanggal_selesai") // format: "2024-06" atau "Sekarang"
+    private String tanggalSelesai; 
+
+    @Column(name = "deskripsi", length = 1000)
     private String deskripsi;
 
+    @Column(name = "jenis_kerja")
     private String jenisKerja; // Full-time, Part-time, Freelance, Magang
 
     // ===== Constructor =====

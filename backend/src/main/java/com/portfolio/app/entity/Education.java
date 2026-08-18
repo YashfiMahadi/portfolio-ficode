@@ -16,21 +16,29 @@ public class Education {
     private Long id;
 
     @NotBlank(message = "Nama institusi tidak boleh kosong")
+    @Column(name = "nama_institusi", nullable = false) // Sesuaikan
     private String namaInstitusi; // Nama sekolah/universitas
 
     @NotBlank(message = "Jurusan tidak boleh kosong")
+    @Column(nullable = false)
     private String jurusan;
 
+    @Column(name = "jenjang")
     private String jenjang; // SD, SMP, SMA, D3, S1, S2, S3
 
+    @Column(name = "tanggal_mulai") // Sesuaikan
     private String tanggalMulai;
+
+    @Column(name = "tanggal_selesai") // Sesuaikan
     private String tanggalSelesai;
 
+    @Column(name = "ipk")
     private Double ipk; // untuk universitas
 
-    @Column(length = 500)
+    @Column(name = "deskripsi", length = 500)
     private String deskripsi;
 
+    @Column(name = "lokasi")
     private String lokasi;
 
     // ===== Constructor =====

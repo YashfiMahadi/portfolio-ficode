@@ -23,7 +23,9 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "nama_lengkap") // Tambahkan ini
     private String namaLengkap;
+
     private String role; // ADMIN, USER
 
     // ===== Constructor =====

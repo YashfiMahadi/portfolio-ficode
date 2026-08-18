@@ -35,7 +35,7 @@ public class Profile {
     private String kota;
     private String provinsi;
 
-    @Column(length = 1000)
+    @Column(name = "tentang_saya", length = 1000)
     private String tentangSaya; // ringkasan/deskripsi diri
 
     private String linkedIn;

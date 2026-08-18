@@ -18,15 +18,18 @@ public class Skill {
     private Long id;
 
     @NotBlank(message = "Nama skill tidak boleh kosong")
-    @Column(nullable = false)
+    @Column(name = "nama_skill", nullable = false)
     private String namaSkill; // contoh: "Java", "Spring Boot", "MySQL"
 
+    @Column(name = "kategori")
     private String kategori; // Backend, Frontend, Database, Tools, Soft Skill
 
     @Min(value = 0, message = "Level minimal 0")
     @Max(value = 100, message = "Level maksimal 100")
+    @Column(name = "level_persen")
     private Integer levelPersen; // 0-100 persen kemampuan
 
+    @Column(name = "tingkat")
     private String tingkat; // Pemula, Menengah, Mahir, Expert
 
     // ===== Constructor =====
