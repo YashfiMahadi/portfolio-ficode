@@ -1,7 +1,7 @@
 // lib/auth.ts
 // Sistem login yang terhubung ke backend Spring Boot Java
 
-const BASE_URL = "http://localhost:8080/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api";
 const SESSION_KEY = "portfolio_user";
 
 export const auth = {
