@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Dropdown } from "@/shared/components/ui/dropdown/dropdown";
 import { DropdownItem } from "@/shared/components/ui/dropdown/dropdown-item";
 import { auth } from "@/shared/services/auth.service";
-import { profileAPI } from "@/shared/services/api";
+import { profileAPI } from "@/app/(features)/(root)/portfolio/services/portfolio.service";
 import { useRouter } from "next/navigation";
 
 

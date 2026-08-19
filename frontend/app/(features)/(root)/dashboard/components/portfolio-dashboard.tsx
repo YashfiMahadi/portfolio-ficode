@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
-import { profileAPI, skillAPI, experienceAPI, educationAPI, projectAPI, certificationAPI } from "@/shared/services/api";
+import { profileAPI, skillAPI, experienceAPI, educationAPI, projectAPI, certificationAPI } from "@/app/(features)/(root)/portfolio/services/portfolio.service";
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 

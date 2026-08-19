@@ -14,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/shared/components/ui/table/index"; // sesuaikan path sesuai isi folder table kamu
+} from "@/shared/components/ui/table"; // sesuaikan path sesuai isi folder table kamu
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
