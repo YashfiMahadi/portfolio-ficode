@@ -1,6 +1,6 @@
 "use client";
 
-import { Table, flexRender } from "@tanstack/react-table";
+import { Table, flexRender, type ColumnFiltersState, } from "@tanstack/react-table";
 import {
   ChevronLeft,
   ChevronRight,
@@ -42,7 +42,6 @@ export function SkillsTable({
             className="pl-9"
           />
         </div>
-
         <div className="text-sm text-gray-500">
           {table.getFilteredRowModel().rows.length} data
         </div>
