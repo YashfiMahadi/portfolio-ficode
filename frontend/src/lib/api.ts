@@ -2,7 +2,7 @@
 // Service layer untuk komunikasi dengan backend Spring Boot
 // Base URL backend
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api" || "http://127.0.0.1:8000/api";
 
 // ===== Helper fetch =====
 async function apiFetch(endpoint: string, options?: RequestInit) {
