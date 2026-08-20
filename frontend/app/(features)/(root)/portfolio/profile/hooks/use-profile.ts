@@ -79,7 +79,7 @@ export function useProfile() {
     setUploading(true);
 
     try {
-      const url = await uploadAPI.uploadPhoto(file);
+      const url = await uploadAPI.uploadProfilePhoto(file);
       const updatedData = { ...formData, fotoUrl: url };
 
       setFormData(updatedData);

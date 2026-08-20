@@ -75,10 +75,24 @@ export const certificationAPI = {
 
 // ===== UPLOAD =====
 export const uploadAPI = {
-  uploadPhoto: async (file: File): Promise<string> => {
+  // Untuk upload foto profil (masuk ke folder "profile" di Cloudinary)
+  uploadProfilePhoto: async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
-    const res = await fetch(`${BASE_URL}/upload/photo`, {
+    const res = await fetch(`${BASE_URL}/upload/profile`, {
+      method: "POST",
+      body: formData,
+    });
+    const data = await res.json();
+    if (data.status === "success") return data.url;
+    throw new Error(data.pesan);
+  },
+
+  // Untuk upload foto project (masuk ke folder "project" di Cloudinary)
+  uploadProjectPhoto: async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append("file", file);
+    const res = await fetch(`${BASE_URL}/upload/project`, {
       method: "POST",
       body: formData,
     });

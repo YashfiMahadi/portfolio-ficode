@@ -75,7 +75,7 @@ export function useProjects() {
     setUploading(true);
 
     try {
-      const url = await uploadAPI.uploadPhoto(file);
+      const url = await uploadAPI.uploadProjectPhoto(file);
       setForm((prev) => ({ ...prev, gambarUrl: url }));
     } catch {
       alert("Gagal upload thumbnail.");
