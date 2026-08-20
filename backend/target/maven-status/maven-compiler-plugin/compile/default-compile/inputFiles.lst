@@ -24,6 +24,7 @@ D:\YASHFI\A Tugas Utama\Tugas Java Lanjut\portfolio\portfolio-ficode\backend\src
 D:\YASHFI\A Tugas Utama\Tugas Java Lanjut\portfolio\portfolio-ficode\backend\src\main\java\com\portfolio\app\controller\FileUploadController.java
 D:\YASHFI\A Tugas Utama\Tugas Java Lanjut\portfolio\portfolio-ficode\backend\src\main\java\com\portfolio\app\repository\UserRepository.java
 D:\YASHFI\A Tugas Utama\Tugas Java Lanjut\portfolio\portfolio-ficode\backend\src\main\java\com\portfolio\app\service\ExperienceService.java
+D:\YASHFI\A Tugas Utama\Tugas Java Lanjut\portfolio\portfolio-ficode\backend\src\main\java\com\portfolio\app\config\CloudinaryConfig.java
 D:\YASHFI\A Tugas Utama\Tugas Java Lanjut\portfolio\portfolio-ficode\backend\src\main\java\com\portfolio\app\entity\Certification.java
 D:\YASHFI\A Tugas Utama\Tugas Java Lanjut\portfolio\portfolio-ficode\backend\src\main\java\com\portfolio\app\repository\ProjectRepository.java
 D:\YASHFI\A Tugas Utama\Tugas Java Lanjut\portfolio\portfolio-ficode\backend\src\main\java\com\portfolio\app\config\CorsConfig.java

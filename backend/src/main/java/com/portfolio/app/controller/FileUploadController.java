@@ -1,23 +1,23 @@
 package com.portfolio.app.controller;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/upload")
 @CrossOrigin(origins = "*")
 public class FileUploadController {
 
-    @Value("${file.upload-dir}")
-    private String uploadDir;
+    @Autowired
+    private Cloudinary cloudinary;
 
     @PostMapping("/photo")
     public ResponseEntity<Map<String, Object>> uploadPhoto(
@@ -34,26 +34,14 @@ public class FileUploadController {
         }
 
         try {
-            // Buat folder jika belum ada
-            Path uploadPath = Paths.get(uploadDir);
-            if (!Files.exists(uploadPath)) {
-                Files.createDirectories(uploadPath);
-            }
-
-            // Generate nama file unik
-            String ext = file.getOriginalFilename()
-                    .substring(file.getOriginalFilename().lastIndexOf("."));
-            String fileName = UUID.randomUUID().toString() + ext;
-
-            // Simpan file
-            Path filePath = uploadPath.resolve(fileName);
-            Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // Return URL foto
-            String fileUrl = "http://localhost:8080/uploads/photos/" + fileName;
+            // Upload file langsung ke Cloudinary
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            
+            // Ambil URL aman (HTTPS) dan public_id dari Cloudinary
+            String fileUrl = (String) uploadResult.get("url");
 
             response.put("status", "success");
-            response.put("pesan", "Foto berhasil diupload");
+            response.put("pesan", "Foto berhasil diupload ke Cloudinary");
             response.put("url", fileUrl);
             return ResponseEntity.ok(response);
 

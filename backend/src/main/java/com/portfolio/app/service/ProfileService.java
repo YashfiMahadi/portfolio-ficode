@@ -1,39 +1,62 @@
 package com.portfolio.app.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.portfolio.app.entity.Profile;
 import com.portfolio.app.repository.ProfileRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-/**
- * ProfileService - Business logic untuk Profile
- * Konsep OOP: Service layer memisahkan logika bisnis dari controller
- */
 @Service
 public class ProfileService {
 
     @Autowired
     private ProfileRepository profileRepository;
 
+    @Autowired
+    private Cloudinary cloudinary;
+
     private void hapusFileFoto(String fotoUrl) {
         if (fotoUrl == null || fotoUrl.isEmpty()) return;
 
         try {
-            String namaFile = fotoUrl.substring(fotoUrl.lastIndexOf("/") + 1);
+            // Ekstrak public_id dari URL Cloudinary untuk proses penghapusan
+            // Contoh URL: https://res.cloudinary.com/.../image/upload/v123456/folder/sample.jpg
+            String publicId = extractPublicIdFromUrl(fotoUrl);
+            if (publicId != null) {
+                cloudinary.uploader().destroy(publicId, ObjectUtils.emptyMap());
+                System.out.println("✅ Foto Cloudinary berhasil dihapus: " + publicId);
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ Gagal menghapus foto dari Cloudinary: " + e.getMessage());
+        }
+    }
 
-            Path path = Paths.get("uploads/photos", namaFile);
-
-            Files.deleteIfExists(path);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+    // Helper untuk mengambil public_id dari URL Cloudinary
+    private String extractPublicIdFromUrl(String url) {
+        try {
+            int uploadIndex = url.indexOf("/upload/");
+            if (uploadIndex == -1) return null;
+            
+            String afterUpload = url.substring(uploadIndex + 8); // Lewati "/upload/"
+            // Hilangkan versi jika ada (misal: v12345678/)
+            if (afterUpload.startsWith("v")) {
+                int slashIndex = afterUpload.indexOf('/');
+                if (slashIndex != -1) {
+                    afterUpload = afterUpload.substring(slashIndex + 1);
+                }
+            }
+            // Hilangkan ekstensi file (.jpg, .png, dll)
+            int dotIndex = afterUpload.lastIndexOf('.');
+            if (dotIndex != -1) {
+                afterUpload = afterUpload.substring(0, dotIndex);
+            }
+            return afterUpload;
+        } catch (Exception e) {
+            return null;
         }
     }
 
@@ -63,7 +86,7 @@ public class ProfileService {
             profile.setGithub(profileBaru.getGithub());
             profile.setWebsite(profileBaru.getWebsite());
 
-            // Kalau foto berubah, hapus foto lama
+            // Kalau foto berubah, hapus foto lama dari Cloudinary
             if (profile.getFotoUrl() != null &&
                 profileBaru.getFotoUrl() != null &&
                 !profile.getFotoUrl().equals(profileBaru.getFotoUrl())) {
