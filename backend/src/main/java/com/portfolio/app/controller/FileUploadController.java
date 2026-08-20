@@ -19,10 +19,20 @@ public class FileUploadController {
     @Autowired
     private Cloudinary cloudinary;
 
-    @PostMapping("/photo")
-    public ResponseEntity<Map<String, Object>> uploadPhoto(
-            @RequestParam("file") MultipartFile file) {
+    // Endpoint khusus untuk foto Profil -> Masuk ke folder "profile" di Cloudinary
+    @PostMapping("/profile")
+    public ResponseEntity<Map<String, Object>> uploadProfilePhoto(@RequestParam("file") MultipartFile file) {
+        return uploadToCloudinary(file, "profile");
+    }
 
+    // Endpoint khusus untuk foto Project -> Masuk ke folder "project" di Cloudinary
+    @PostMapping("/project")
+    public ResponseEntity<Map<String, Object>> uploadProjectPhoto(@RequestParam("file") MultipartFile file) {
+        return uploadToCloudinary(file, "project");
+    }
+
+    // Method pembantu (helper) supaya tidak menulis kode berulang kali
+    private ResponseEntity<Map<String, Object>> uploadToCloudinary(MultipartFile file, String folderName) {
         Map<String, Object> response = new HashMap<>();
 
         // Validasi tipe file
@@ -34,14 +44,17 @@ public class FileUploadController {
         }
 
         try {
-            // Upload file langsung ke Cloudinary
-            Map<?, ?> uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            // Upload file ke Cloudinary dengan memasukkan parameter folder
+            Map<?, ?> uploadResult = cloudinary.uploader().upload(
+                file.getBytes(), 
+                ObjectUtils.asMap("folder", folderName)
+            );
             
-            // Ambil URL aman (HTTPS) dan public_id dari Cloudinary
+            // Ambil URL aman (HTTPS) dari hasil upload
             String fileUrl = (String) uploadResult.get("url");
 
             response.put("status", "success");
-            response.put("pesan", "Foto berhasil diupload ke Cloudinary");
+            response.put("pesan", "Foto berhasil diupload ke folder " + folderName);
             response.put("url", fileUrl);
             return ResponseEntity.ok(response);
 
