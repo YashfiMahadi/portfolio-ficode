@@ -11,7 +11,7 @@ import {
   Skill,
 } from "../interfaces/cv.d";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api" || "http://localhost:8080/api";
 
 async function apiFetch(endpoint: string) {
   const res = await fetch(`${BASE_URL}${endpoint}`);

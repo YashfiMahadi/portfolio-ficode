@@ -78,7 +78,7 @@ export const uploadAPI = {
   uploadPhoto: async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
-    const res = await fetch("http://localhost:8080/api/upload/photo", {
+    const res = await fetch(`${BASE_URL}/upload/photo`, {
       method: "POST",
       body: formData,
     });
