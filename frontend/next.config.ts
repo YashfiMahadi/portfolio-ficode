@@ -21,6 +21,14 @@ const nextConfig: NextConfig = {
   
   images: {
     remotePatterns: [
+      // Backend produksi (Railway) — tempat foto profile & thumbnail proyek
+      // sebenarnya di-upload dan disimpan.
+      {
+        protocol: "https",
+        hostname: "portfolio-ficode-production.up.railway.app",
+        pathname: "/uploads/**",
+      },
+      // Backend lokal, untuk development di komputer sendiri.
       {
         protocol: "http",
         hostname: "localhost",
