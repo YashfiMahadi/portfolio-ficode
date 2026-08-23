@@ -1,5 +1,3 @@
-// Tipe data untuk fitur Experience (pengalaman kerja).
-
 export interface Experience {
   id?: number;
   namaPerusahaan: string;

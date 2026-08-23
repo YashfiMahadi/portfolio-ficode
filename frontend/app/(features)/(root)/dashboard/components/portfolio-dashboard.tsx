@@ -1,79 +1,27 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
+import Link from "next/link";
 import dynamic from "next/dynamic";
 import { ApexOptions } from "apexcharts";
-import { profileAPI, skillAPI, experienceAPI, educationAPI, projectAPI, certificationAPI } from "@/app/(features)/(root)/portfolio/services/portfolio.service";
+import { useDashboard } from "@/app/(features)/(root)/dashboard/hooks/use-dashboard";
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
 
-interface StatItem { label: string; value: number; icon: string; href: string; color: string; }
-
 export default function PortfolioDashboard() {
-  const [stats, setStats] = useState<StatItem[]>([]);
-  const [skillCategories, setSkillCategories] = useState<string[]>([]);
-  const [skillCounts, setSkillCounts] = useState<number[]>([]);
-  const [radarLabels, setRadarLabels] = useState<string[]>([]);
-  const [radarData, setRadarData] = useState<number[]>([]);
-  const [pieLabels, setPieLabels] = useState<string[]>([]);
-  const [pieData, setPieData] = useState<number[]>([]);
-  const [rataRata, setRataRata] = useState(0);
-  const [totalSkill, setTotalSkill] = useState(0);
-  const [profileName, setProfileName] = useState("");
-  const [profileJob, setProfileJob] = useState("");
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchAll = async () => {
-      try {
-        const [profiles, skills, experiences, educations, projects, certifications, skillStat, projStat] =
-          await Promise.all([
-            profileAPI.getAll(),
-            skillAPI.getAll(),
-            experienceAPI.getAll(),
-            educationAPI.getAll(),
-            projectAPI.getAll(),
-            certificationAPI.getAll(),
-            skillAPI.getStatistik(),
-            projectAPI.getStatistik(),
-          ]);
-
-        if (profiles.data?.length > 0) {
-          setProfileName(profiles.data[0].nama);
-          setProfileJob(profiles.data[0].jabatan);
-        }
-
-        setStats([
-          { label: "Skill", value: skills.data?.length || 0, icon: "⚡", href: "/portfolio/skills", color: "from-purple-500 to-purple-600" },
-          { label: "Pengalaman", value: experiences.data?.length || 0, icon: "💼", href: "/portfolio/experience", color: "from-orange-500 to-orange-600" },
-          { label: "Pendidikan", value: educations.data?.length || 0, icon: "🎓", href: "/portfolio/education", color: "from-green-500 to-green-600" },
-          { label: "Proyek", value: projects.data?.length || 0, icon: "🚀", href: "/portfolio/projects", color: "from-red-500 to-red-600" },
-          { label: "Sertifikasi", value: certifications.data?.length || 0, icon: "🏆", href: "/portfolio/certifications", color: "from-yellow-500 to-yellow-600" },
-        ]);
-
-        const skillPerKat = skillStat.skillPerKategori || {};
-        setSkillCategories(Object.keys(skillPerKat));
-        setSkillCounts(Object.values(skillPerKat) as number[]);
-        setRataRata(Math.round(skillStat.rataRataLevel || 0));
-        setTotalSkill(skills.data?.length || 0);
-
-        const topSkills = (skills.data || [])
-          .sort((a: { levelPersen: number }, b: { levelPersen: number }) => b.levelPersen - a.levelPersen)
-          .slice(0, 6);
-        setRadarLabels(topSkills.map((s: { namaSkill: string }) => s.namaSkill));
-        setRadarData(topSkills.map((s: { levelPersen: number }) => s.levelPersen));
-
-        const projPerKat = projStat.proyekPerKategori || {};
-        setPieLabels(Object.keys(projPerKat));
-        setPieData(Object.values(projPerKat) as number[]);
-
-      } catch {
-        // backend belum jalan
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchAll();
-  }, []);
+  const {
+    stats,
+    skillCategories,
+    skillCounts,
+    radarLabels,
+    radarData,
+    pieLabels,
+    pieData,
+    rataRata,
+    totalSkill,
+    profileName,
+    profileJob,
+    loading,
+  } = useDashboard();
 
   const barOptions: ApexOptions = {
     colors: ["#465fff"],
@@ -128,7 +76,7 @@ export default function PortfolioDashboard() {
               <div key={i} className="h-28 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" />
             ))
           : stats.map(s => (
-              <a key={s.label} href={s.href}
+              <Link key={s.label} href={s.href}
                 className="group relative overflow-hidden rounded-xl bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:bg-gray-900 border border-gray-100 dark:border-gray-700">
                 <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${s.color}`} />
                 <div className="p-4 text-center">
@@ -136,7 +84,7 @@ export default function PortfolioDashboard() {
                   <p className="mt-2 text-2xl font-bold text-gray-800 dark:text-white">{s.value}</p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">{s.label}</p>
                 </div>
-              </a>
+              </Link>
             ))
         }
       </div>
@@ -223,11 +171,11 @@ export default function PortfolioDashboard() {
               { label: "Pendidikan", href: "/portfolio/education", icon: "🎓", color: "hover:bg-green-50 dark:hover:bg-green-900/20 border-green-100 dark:border-green-800" },
               { label: "Sertifikasi", href: "/portfolio/certifications", icon: "🏆", color: "hover:bg-yellow-50 dark:hover:bg-yellow-900/20 border-yellow-100 dark:border-yellow-800" },
             ].map(item => (
-              <a key={item.label} href={item.href}
+              <Link key={item.label} href={item.href}
                 className={`flex flex-col items-center rounded-lg border p-3 text-center text-xs transition ${item.color}`}>
                 <span className="text-xl">{item.icon}</span>
                 <span className="mt-1 font-medium text-gray-600 dark:text-gray-300">{item.label}</span>
-              </a>
+              </Link>
             ))}
           </div>
         </div>

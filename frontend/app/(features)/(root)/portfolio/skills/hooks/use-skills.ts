@@ -1,26 +1,39 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  SortingState,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from "@tanstack/react-table";
-
+import type { SortingState } from "@tanstack/react-table";
 import { skillAPI } from "@/app/(features)/(root)/portfolio/services/portfolio.service";
-import { Skill } from "../interfaces/skill.d";
-import { emptySkill } from "../constants";
-import { getSkillColumns } from "../components/skill-columns";
+import type { Skill } from "@/app/(features)/(root)/portfolio/skills/interfaces/skill";
+import type { SkillFormValues } from "@/app/(features)/(root)/portfolio/skills/interfaces/skill-schema";
+
+export const emptySkill: SkillFormValues = {
+  namaSkill: "",
+  kategori: "",
+  levelPersen: 0,
+  tingkat: "",
+};
+
+export const kategoriList: string[] = [
+  "Backend",
+  "Frontend",
+  "Database",
+  "Tools",
+  "Mobile",
+  "Soft Skill",
+];
+
+export function getLevelColor(level: number) {
+  if (level >= 80) return "bg-green-500";
+  if (level >= 60) return "bg-blue-500";
+  if (level >= 40) return "bg-yellow-500";
+  return "bg-red-400";
+}
 
 /**
- * Menyimpan seluruh state & logic untuk halaman Skills:
- * - fetch data dari backend
- * - buka/tutup modal tambah/edit
- * - simpan (create/update) & hapus data
- * - instance react-table (sorting, filter, pagination)
+ * Hook untuk halaman Skills: mengelola data list, state modal
+ * tambah/edit, serta operasi create/update/delete ke portfolio.service.
+ * Validasi form dilakukan di komponen modal via react-hook-form + zod;
+ * hook ini hanya menerima values yang sudah tervalidasi lewat handleSave.
  */
 export function useSkills() {
   const [skills, setSkills] = useState<Skill[]>([]);
@@ -28,19 +41,16 @@ export function useSkills() {
   const [error, setError] = useState("");
 
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState<Skill>(emptySkill);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editItem, setEditItem] = useState<Skill | null>(null);
   const [saving, setSaving] = useState(false);
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  // ===== FETCH DATA =====
   const fetchSkills = async () => {
     try {
       setLoading(true);
       setError("");
-
       const res = await skillAPI.getAll();
       setSkills(res.data || []);
     } catch {
@@ -54,41 +64,29 @@ export function useSkills() {
     fetchSkills();
   }, []);
 
-  // ===== MODAL =====
   const openAdd = () => {
-    setForm({ ...emptySkill });
-    setEditId(null);
+    setEditItem(null);
     setShowModal(true);
   };
 
   const openEdit = (skill: Skill) => {
-    setForm({ ...emptySkill, ...skill });
-    setEditId(skill.id!);
+    setEditItem(skill);
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
-    setForm({ ...emptySkill });
-    setEditId(null);
+    setEditItem(null);
   };
 
-  // ===== SAVE =====
-  const handleSave = async () => {
-    if (!form.namaSkill || !form.kategori) {
-      alert("Nama skill dan kategori wajib diisi!");
-      return;
-    }
-
+  const handleSave = async (values: SkillFormValues) => {
     setSaving(true);
-
     try {
-      if (editId) {
-        await skillAPI.update(editId, form);
+      if (editItem?.id) {
+        await skillAPI.update(editItem.id, values);
       } else {
-        await skillAPI.create(form);
+        await skillAPI.create(values);
       }
-
       closeModal();
       await fetchSkills();
     } catch {
@@ -98,10 +96,8 @@ export function useSkills() {
     }
   };
 
-  // ===== DELETE =====
   const handleDelete = async (id: number) => {
     if (!confirm("Yakin hapus skill ini?")) return;
-
     try {
       await skillAPI.delete(id);
       await fetchSkills();
@@ -110,45 +106,21 @@ export function useSkills() {
     }
   };
 
-  // ===== TABLE =====
-  const columns = getSkillColumns(openEdit, handleDelete);
-
-  const table = useReactTable({
-    data: skills,
-    columns,
-
-    state: { sorting, globalFilter },
-
-    onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
-
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-
-    globalFilterFn: "includesString",
-
-    initialState: {
-      pagination: { pageSize: 5 },
-    },
-  });
-
   return {
+    skills,
     loading,
     error,
-    table,
+    showModal,
+    editItem,
+    saving,
+    sorting,
+    setSorting,
     globalFilter,
     setGlobalFilter,
-
-    showModal,
-    form,
-    setForm,
-    editId,
-    saving,
-
     openAdd,
+    openEdit,
     closeModal,
     handleSave,
+    handleDelete,
   };
 }

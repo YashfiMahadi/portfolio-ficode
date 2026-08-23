@@ -1,18 +1,57 @@
 "use client";
 
-import { Profile } from "../interfaces/profile.d";
-import { ProfileField } from "./profile-field";
+import { useEffect } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/shared/components/ui/form";
+import Input from "@/shared/components/form/input/input-field";
+import { Button } from "@/shared/components/ui/button";
+import type { PortfolioProfile } from "@/app/(features)/(root)/portfolio/profile/interfaces/profile";
+import {
+  portfolioProfileSchema,
+  type PortfolioProfileFormValues,
+} from "@/app/(features)/(root)/portfolio/profile/interfaces/profile-schema";
+import { emptyProfile } from "@/app/(features)/(root)/portfolio/profile/hooks/use-portfolio-profile";
 
 interface ProfileEditFormProps {
-  formData: Profile;
+  profile: PortfolioProfile | null;
   saving: boolean;
   successMsg: string;
   error: string;
-  onChange: (field: keyof Profile, value: string) => void;
-  onSave: () => void;
+  onSave: (values: PortfolioProfileFormValues) => void;
 }
 
-export function ProfileEditForm({ formData, saving, successMsg, error, onChange, onSave }: ProfileEditFormProps) {
+const TEXT_FIELDS: { label: string; key: keyof PortfolioProfileFormValues; placeholder: string; span?: boolean }[] = [
+  { label: "Nama Lengkap *", key: "nama", placeholder: "Nama kamu" },
+  { label: "Jabatan *", key: "jabatan", placeholder: "Backend Developer" },
+  { label: "Email", key: "email", placeholder: "email@kamu.com" },
+  { label: "Telepon", key: "telepon", placeholder: "08123456789" },
+  { label: "Kota", key: "kota", placeholder: "Bandung" },
+  { label: "Provinsi", key: "provinsi", placeholder: "Jawa Barat" },
+  { label: "Alamat", key: "alamat", placeholder: "Jl. Contoh No. 1", span: true },
+  { label: "LinkedIn", key: "linkedIn", placeholder: "https://linkedin.com/in/..." },
+  { label: "GitHub", key: "github", placeholder: "https://github.com/..." },
+  { label: "Website", key: "website", placeholder: "https://website.com", span: true },
+];
+
+export default function ProfileEditForm({ profile, saving, successMsg, error, onSave }: ProfileEditFormProps) {
+  const form = useForm<PortfolioProfileFormValues>({
+    resolver: zodResolver(portfolioProfileSchema),
+    defaultValues: emptyProfile,
+  });
+
+  // Sinkronkan form begitu data profile selesai di-fetch dari server.
+  useEffect(() => {
+    if (profile) form.reset({ ...emptyProfile, ...profile });
+  }, [profile]);
+
   return (
     <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-900">
       <h2 className="mb-5 text-lg font-semibold text-gray-800 dark:text-white">Edit Profile</h2>
@@ -28,46 +67,54 @@ export function ProfileEditForm({ formData, saving, successMsg, error, onChange,
         </div>
       )}
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <ProfileField label="Nama Lengkap *" field="nama" placeholder="Nama kamu" value={formData.nama} onChange={onChange} />
-        <ProfileField label="Jabatan *" field="jabatan" placeholder="Backend Developer" value={formData.jabatan} onChange={onChange} />
-        <ProfileField label="Email" field="email" type="email" placeholder="email@kamu.com" value={formData.email} onChange={onChange} />
-        <ProfileField label="Telepon" field="telepon" placeholder="08123456789" value={formData.telepon} onChange={onChange} />
-        <ProfileField label="Kota" field="kota" placeholder="Bandung" value={formData.kota} onChange={onChange} />
-        <ProfileField label="Provinsi" field="provinsi" placeholder="Jawa Barat" value={formData.provinsi} onChange={onChange} />
+      <Form {...form}>
+        <form onSubmit={form.handleSubmit(onSave)}>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {TEXT_FIELDS.map(({ label, key, placeholder, span }) => (
+              <FormField
+                key={key}
+                control={form.control}
+                name={key}
+                render={({ field }) => (
+                  <FormItem className={span ? "sm:col-span-2" : ""}>
+                    <FormLabel>{label}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={placeholder} {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
 
-        <div className="sm:col-span-2">
-          <ProfileField label="Alamat" field="alamat" placeholder="Jl. Contoh No. 1" value={formData.alamat} onChange={onChange} />
-        </div>
+            <FormField
+              control={form.control}
+              name="tentangSaya"
+              render={({ field }) => (
+                <FormItem className="sm:col-span-2">
+                  <FormLabel>Tentang Saya</FormLabel>
+                  <FormControl>
+                    <textarea
+                      rows={4}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                      placeholder="Deskripsi singkat tentang dirimu..."
+                      {...field}
+                      value={field.value ?? ""}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
 
-        <ProfileField label="LinkedIn" field="linkedIn" placeholder="https://linkedin.com/in/..." value={formData.linkedIn} onChange={onChange} />
-        <ProfileField label="GitHub" field="github" placeholder="https://github.com/..." value={formData.github} onChange={onChange} />
-
-        <div className="sm:col-span-2">
-          <ProfileField label="Website" field="website" placeholder="https://website.com" value={formData.website} onChange={onChange} />
-        </div>
-
-        <div className="sm:col-span-2">
-          <ProfileField
-            label="Tentang Saya"
-            field="tentangSaya"
-            type="textarea"
-            placeholder="Deskripsi singkat tentang dirimu..."
-            value={formData.tentangSaya}
-            onChange={onChange}
-          />
-        </div>
-      </div>
-
-      <div className="mt-5 flex justify-end">
-        <button
-          onClick={onSave}
-          disabled={saving}
-          className="rounded-lg bg-blue-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
-        >
-          {saving ? "Menyimpan..." : "Simpan Profile"}
-        </button>
-      </div>
+          <div className="mt-5 flex justify-end">
+            <Button type="submit" disabled={saving}>
+              {saving ? "Menyimpan..." : "Simpan Profile"}
+            </Button>
+          </div>
+        </form>
+      </Form>
     </div>
   );
 }

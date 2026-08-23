@@ -1,29 +1,43 @@
 "use client";
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { auth } from "@/shared/services/auth.service";
 import { EyeCloseIcon, EyeIcon } from "@/shared/components/icons/index";
+import Input from "@/shared/components/form/input/input-field";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/shared/components/ui/form";
+import {
+  signInSchema,
+  type SignInFormValues,
+} from "@/app/(features)/(auth)/signin/interfaces/signin-schema";
 
 export default function SignInForm() {
   const router = useRouter();
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [serverError, setServerError] = useState("");
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError("");
-    setLoading(true);
+  const form = useForm<SignInFormValues>({
+    resolver: zodResolver(signInSchema),
+    defaultValues: { username: "", password: "" },
+  });
 
-    const result = await auth.login(username, password);
+  const onSubmit = async (values: SignInFormValues) => {
+    setServerError("");
+    const result = await auth.login(values.username, values.password);
     if (result.success) {
       router.push("/");
     } else {
-      setError(result.pesan);
+      setServerError(result.pesan);
     }
-    setLoading(false);
   };
 
   return (
@@ -51,64 +65,72 @@ export default function SignInForm() {
             Masukkan username dan password untuk melanjutkan
           </p>
 
-          {error && (
+          {serverError && (
             <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600 dark:bg-red-900/30 dark:text-red-400">
-              ❌ {error}
+              ❌ {serverError}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-4">
-            {/* Username */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Username
-              </label>
-              <input
-                type="text"
-                value={username}
-                onChange={e => setUsername(e.target.value)}
-                placeholder="Masukkan username"
-                required
-                className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              {/* Username */}
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Masukkan username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-            </div>
 
-            {/* Password */}
-            <div>
-              <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={e => setPassword(e.target.value)}
-                  placeholder="Masukkan password"
-                  required
-                  className="w-full rounded-lg border border-gray-300 px-4 py-2.5 pr-11 text-sm text-gray-800 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-                >
-                  {showPassword
-                    ? <EyeIcon className="h-5 w-5 fill-gray-400" />
-                    : <EyeCloseIcon className="h-5 w-5 fill-gray-400" />
-                  }
-                </button>
-              </div>
-            </div>
+              {/* Password */}
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <div className="relative">
+                        <Input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Masukkan password"
+                          className="pr-11"
+                          {...field}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+                        >
+                          {showPassword ? (
+                            <EyeIcon className="h-5 w-5 fill-gray-400" />
+                          ) : (
+                            <EyeCloseIcon className="h-5 w-5 fill-gray-400" />
+                          )}
+                        </button>
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Submit */}
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-2 w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
-            >
-              {loading ? "Memverifikasi..." : "Masuk →"}
-            </button>
-          </form>
+              {/* Submit */}
+              <button
+                type="submit"
+                disabled={form.formState.isSubmitting}
+                className="mt-2 w-full rounded-lg bg-gradient-to-r from-blue-600 to-purple-600 py-2.5 text-sm font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+              >
+                {form.formState.isSubmitting ? "Memverifikasi..." : "Masuk →"}
+              </button>
+            </form>
+          </Form>
         </div>
 
         <p className="mt-4 text-center text-xs text-gray-400">

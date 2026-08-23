@@ -1,5 +1,3 @@
-// Tipe data untuk fitur Certifications.
-
 export interface Certification {
   id?: number;
   namaSertifikat: string;

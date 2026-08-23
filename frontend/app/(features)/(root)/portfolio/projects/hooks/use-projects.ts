@@ -1,18 +1,35 @@
 "use client";
 
-import { ChangeEvent, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { projectAPI, uploadAPI } from "@/app/(features)/(root)/portfolio/services/portfolio.service";
+import type { Project } from "@/app/(features)/(root)/portfolio/projects/interfaces/project";
+import type { ProjectFormValues } from "@/app/(features)/(root)/portfolio/projects/interfaces/project-schema";
 
-import { Project } from "../interfaces/project.d";
-import { emptyProject } from "../constants";
+export const emptyProject: ProjectFormValues = {
+  namaProyek: "", deskripsi: "", teknologiDigunakan: "", tanggalMulai: "",
+  tanggalSelesai: "", linkGithub: "", linkDemo: "", gambarUrl: "", kategori: "", statusProyek: "",
+};
 
+export const kategoriList = ["Web", "Mobile", "Desktop", "Data Science", "IoT", "Game", "Lainnya"];
+export const statusList = ["Selesai", "Dalam Pengerjaan", "Ditangguhkan"];
+
+export const statusColor: Record<string, string> = {
+  "Selesai": "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+  "Dalam Pengerjaan": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300",
+  "Ditangguhkan": "bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-300",
+};
+
+/**
+ * Hook untuk halaman Projects: data list, pencarian, state modal
+ * tambah/edit, upload thumbnail, serta operasi CRUD ke portfolio.service.
+ * Validasi form dilakukan di komponen modal via react-hook-form + zod.
+ */
 export function useProjects() {
   const [data, setData] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState<Project>(emptyProject);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editItem, setEditItem] = useState<Project | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [search, setSearch] = useState("");
@@ -33,32 +50,15 @@ export function useProjects() {
     fetchData();
   }, []);
 
-  const openAdd = () => {
-    setForm(emptyProject);
-    setEditId(null);
-    setShowModal(true);
-  };
+  const openAdd = () => { setEditItem(null); setShowModal(true); };
+  const openEdit = (item: Project) => { setEditItem(item); setShowModal(true); };
+  const closeModal = () => { setShowModal(false); setEditItem(null); };
 
-  const openEdit = (item: Project) => {
-    setForm({ ...emptyProject, ...item });
-    setEditId(item.id!);
-    setShowModal(true);
-  };
-
-  const closeModal = () => setShowModal(false);
-
-  const handleSave = async () => {
-    if (!form.namaProyek) {
-      alert("Nama proyek wajib diisi!");
-      return;
-    }
-
+  const handleSave = async (values: ProjectFormValues) => {
     setSaving(true);
-
     try {
-      if (editId) await projectAPI.update(editId, form);
-      else await projectAPI.create(form);
-
+      if (editItem?.id) await projectAPI.update(editItem.id, values);
+      else await projectAPI.create(values);
       closeModal();
       fetchData();
     } catch {
@@ -68,17 +68,13 @@ export function useProjects() {
     }
   };
 
-  const handleUploadThumbnail = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const uploadThumbnail = async (file: File): Promise<string | null> => {
     setUploading(true);
-
     try {
-      const url = await uploadAPI.uploadProjectPhoto(file);
-      setForm((prev) => ({ ...prev, gambarUrl: url }));
+      return await uploadAPI.uploadPhoto(file);
     } catch {
       alert("Gagal upload thumbnail.");
+      return null;
     } finally {
       setUploading(false);
     }
@@ -86,7 +82,6 @@ export function useProjects() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Yakin hapus proyek ini?")) return;
-
     try {
       await projectAPI.delete(id);
       fetchData();
@@ -102,22 +97,20 @@ export function useProjects() {
   );
 
   return {
+    filtered,
     loading,
     error,
-    filtered,
-    search,
-    setSearch,
     showModal,
-    form,
-    setForm,
-    editId,
+    editItem,
     saving,
     uploading,
+    search,
+    setSearch,
     openAdd,
     openEdit,
     closeModal,
     handleSave,
+    uploadThumbnail,
     handleDelete,
-    handleUploadThumbnail,
   };
 }

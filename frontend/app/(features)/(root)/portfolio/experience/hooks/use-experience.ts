@@ -2,17 +2,22 @@
 
 import { useEffect, useState } from "react";
 import { experienceAPI } from "@/app/(features)/(root)/portfolio/services/portfolio.service";
+import type { Experience } from "@/app/(features)/(root)/portfolio/experience/interfaces/experience";
+import type { ExperienceFormValues } from "@/app/(features)/(root)/portfolio/experience/interfaces/experience-schema";
 
-import { Experience } from "../interfaces/experience.d";
-import { emptyExperience } from "../constants";
+export const emptyExperience: ExperienceFormValues = {
+  namaPerusahaan: "", posisi: "", lokasiPerusahaan: "",
+  tanggalMulai: "", tanggalSelesai: "", deskripsi: "", jenisKerja: "",
+};
+
+export const jenisKerjaList = ["Full-time", "Part-time", "Freelance", "Magang", "Kontrak"];
 
 export function useExperience() {
   const [data, setData] = useState<Experience[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState<Experience>(emptyExperience);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editItem, setEditItem] = useState<Experience | null>(null);
   const [saving, setSaving] = useState(false);
 
   const fetchData = async () => {
@@ -31,32 +36,15 @@ export function useExperience() {
     fetchData();
   }, []);
 
-  const openAdd = () => {
-    setForm(emptyExperience);
-    setEditId(null);
-    setShowModal(true);
-  };
+  const openAdd = () => { setEditItem(null); setShowModal(true); };
+  const openEdit = (item: Experience) => { setEditItem(item); setShowModal(true); };
+  const closeModal = () => { setShowModal(false); setEditItem(null); };
 
-  const openEdit = (item: Experience) => {
-    setForm({ ...emptyExperience, ...item });
-    setEditId(item.id!);
-    setShowModal(true);
-  };
-
-  const closeModal = () => setShowModal(false);
-
-  const handleSave = async () => {
-    if (!form.namaPerusahaan || !form.posisi) {
-      alert("Nama perusahaan dan posisi wajib diisi!");
-      return;
-    }
-
+  const handleSave = async (values: ExperienceFormValues) => {
     setSaving(true);
-
     try {
-      if (editId) await experienceAPI.update(editId, form);
-      else await experienceAPI.create(form);
-
+      if (editItem?.id) await experienceAPI.update(editItem.id, values);
+      else await experienceAPI.create(values);
       closeModal();
       fetchData();
     } catch {
@@ -68,7 +56,6 @@ export function useExperience() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Yakin hapus?")) return;
-
     try {
       await experienceAPI.delete(id);
       fetchData();
@@ -77,19 +64,5 @@ export function useExperience() {
     }
   };
 
-  return {
-    data,
-    loading,
-    error,
-    showModal,
-    form,
-    setForm,
-    editId,
-    saving,
-    openAdd,
-    openEdit,
-    closeModal,
-    handleSave,
-    handleDelete,
-  };
+  return { data, loading, error, showModal, editItem, saving, openAdd, openEdit, closeModal, handleSave, handleDelete };
 }

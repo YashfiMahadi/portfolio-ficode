@@ -2,7 +2,7 @@
 // Service layer untuk komunikasi dengan backend Spring Boot
 // Base URL backend
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api" || "http://localhost:8080/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api" || "http://127.0.0.1:8000/api";
 
 // ===== Helper fetch =====
 async function apiFetch(endpoint: string, options?: RequestInit) {
@@ -75,24 +75,10 @@ export const certificationAPI = {
 
 // ===== UPLOAD =====
 export const uploadAPI = {
-  // Untuk upload foto profil (masuk ke folder "profile" di Cloudinary)
-  uploadProfilePhoto: async (file: File): Promise<string> => {
+  uploadPhoto: async (file: File): Promise<string> => {
     const formData = new FormData();
     formData.append("file", file);
-    const res = await fetch(`${BASE_URL}/upload/profile`, {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    if (data.status === "success") return data.url;
-    throw new Error(data.pesan);
-  },
-
-  // Untuk upload foto project (masuk ke folder "project" di Cloudinary)
-  uploadProjectPhoto: async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    const res = await fetch(`${BASE_URL}/upload/project`, {
+    const res = await fetch("http://localhost:8080/api/upload/photo", {
       method: "POST",
       body: formData,
     });

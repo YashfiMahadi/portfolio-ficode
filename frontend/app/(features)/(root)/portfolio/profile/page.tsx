@@ -1,22 +1,20 @@
 "use client";
 
-import { useProfile } from "./hooks/use-profile";
-import { ProfileHeaderCard } from "./components/profile-header-card";
-import { ProfileEditForm } from "./components/profile-edit-form";
+import { usePortfolioProfile } from "@/app/(features)/(root)/portfolio/profile/hooks/use-portfolio-profile";
+import ProfileHeaderCard from "@/app/(features)/(root)/portfolio/profile/components/profile-header-card";
+import ProfileEditForm from "@/app/(features)/(root)/portfolio/profile/components/profile-edit-form";
 
-export default function ProfilePage() {
+export default function PortfolioProfilePage() {
   const {
     profile,
-    formData,
     loading,
     saving,
     uploading,
     successMsg,
     error,
-    handleChange,
     handleSave,
-    handleUploadPhoto,
-  } = useProfile();
+    uploadPhoto,
+  } = usePortfolioProfile();
 
   if (loading) {
     return (
@@ -27,15 +25,13 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-4 md:p-6">
-      <ProfileHeaderCard profile={profile} uploading={uploading} onUploadPhoto={handleUploadPhoto} />
-
+    <div className="p-4 md:p-6 max-w-4xl mx-auto space-y-6">
+      <ProfileHeaderCard profile={profile} uploading={uploading} onUploadPhoto={uploadPhoto} />
       <ProfileEditForm
-        formData={formData}
+        profile={profile}
         saving={saving}
         successMsg={successMsg}
         error={error}
-        onChange={handleChange}
         onSave={handleSave}
       />
     </div>

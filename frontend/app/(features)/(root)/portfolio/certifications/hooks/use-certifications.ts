@@ -2,17 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { certificationAPI } from "@/app/(features)/(root)/portfolio/services/portfolio.service";
+import type { Certification } from "@/app/(features)/(root)/portfolio/certifications/interfaces/certification";
+import type { CertificationFormValues } from "@/app/(features)/(root)/portfolio/certifications/interfaces/certification-schema";
 
-import { Certification } from "../interfaces/certification.d";
-import { emptyCertification } from "../constants";
+export const emptyCertification: CertificationFormValues = {
+  namaSertifikat: "", penerbit: "", tanggalTerbit: "",
+  tanggalKadaluarsa: "", nomorSertifikat: "", linkSertifikat: "", kategori: "",
+};
+
+export const kategoriList = ["Programming", "Cloud", "Database", "Design", "Network", "Data Science", "Lainnya"];
+
+export const penerbitColor: Record<string, string> = {
+  "Google": "bg-red-600 text-red-50",
+  "Oracle": "bg-orange-600 text-orange-50",
+  "Microsoft": "bg-blue-600 text-blue-50",
+  "AWS": "bg-yellow-600 text-yellow-50",
+  "Udemy": "bg-purple-600 text-purple-50",
+  "Coursera": "bg-cyan-600 text-cyan-50",
+};
 
 export function useCertifications() {
   const [data, setData] = useState<Certification[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState<Certification>(emptyCertification);
-  const [editId, setEditId] = useState<number | null>(null);
+  const [editItem, setEditItem] = useState<Certification | null>(null);
   const [saving, setSaving] = useState(false);
 
   const fetchData = async () => {
@@ -31,32 +45,15 @@ export function useCertifications() {
     fetchData();
   }, []);
 
-  const openAdd = () => {
-    setForm(emptyCertification);
-    setEditId(null);
-    setShowModal(true);
-  };
+  const openAdd = () => { setEditItem(null); setShowModal(true); };
+  const openEdit = (item: Certification) => { setEditItem(item); setShowModal(true); };
+  const closeModal = () => { setShowModal(false); setEditItem(null); };
 
-  const openEdit = (item: Certification) => {
-    setForm({ ...emptyCertification, ...item });
-    setEditId(item.id!);
-    setShowModal(true);
-  };
-
-  const closeModal = () => setShowModal(false);
-
-  const handleSave = async () => {
-    if (!form.namaSertifikat || !form.penerbit) {
-      alert("Nama sertifikat dan penerbit wajib diisi!");
-      return;
-    }
-
+  const handleSave = async (values: CertificationFormValues) => {
     setSaving(true);
-
     try {
-      if (editId) await certificationAPI.update(editId, form);
-      else await certificationAPI.create(form);
-
+      if (editItem?.id) await certificationAPI.update(editItem.id, values);
+      else await certificationAPI.create(values);
       closeModal();
       fetchData();
     } catch {
@@ -68,7 +65,6 @@ export function useCertifications() {
 
   const handleDelete = async (id: number) => {
     if (!confirm("Yakin hapus sertifikasi ini?")) return;
-
     try {
       await certificationAPI.delete(id);
       fetchData();
@@ -77,19 +73,5 @@ export function useCertifications() {
     }
   };
 
-  return {
-    data,
-    loading,
-    error,
-    showModal,
-    form,
-    setForm,
-    editId,
-    saving,
-    openAdd,
-    openEdit,
-    closeModal,
-    handleSave,
-    handleDelete,
-  };
+  return { data, loading, error, showModal, editItem, saving, openAdd, openEdit, closeModal, handleSave, handleDelete };
 }

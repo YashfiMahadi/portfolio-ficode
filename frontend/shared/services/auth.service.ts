@@ -1,7 +1,7 @@
 // lib/auth.ts
 // Sistem login yang terhubung ke backend Spring Boot Java
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api" || "http://localhost:8080/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api" || "http://127.0.0.1:8000/api";
 const SESSION_KEY = "portfolio_user";
 
 export const auth = {
@@ -23,6 +23,31 @@ export const auth = {
       } else {
         return { success: false, pesan: data.pesan || "Login gagal" };
       }
+    } catch {
+      return { success: false, pesan: "Tidak dapat terhubung ke server. Pastikan backend berjalan." };
+    }
+  },
+
+  // Register: fetch ke POST /api/auth/register
+  async register(payload: {
+    namaLengkap: string;
+    username: string;
+    email: string;
+    password: string;
+  }): Promise<{ success: boolean; pesan: string }> {
+    try {
+      const res = await fetch(`${BASE_URL}/auth/register`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (data.status === "success") {
+        return { success: true, pesan: data.pesan || "Registrasi berhasil" };
+      }
+      return { success: false, pesan: data.pesan || "Registrasi gagal" };
     } catch {
       return { success: false, pesan: "Tidak dapat terhubung ke server. Pastikan backend berjalan." };
     }

@@ -1,28 +1,26 @@
 "use client";
 
-import { useProjects } from "./hooks/use-projects";
-import { ProjectGrid } from "./components/project-grid";
-import { ProjectFormModal } from "./components/project-form-modal";
+import { useProjects } from "@/app/(features)/(root)/portfolio/projects/hooks/use-projects";
+import ProjectGrid from "@/app/(features)/(root)/portfolio/projects/components/project-grid";
+import ProjectFormModal from "@/app/(features)/(root)/portfolio/projects/components/project-form-modal";
 
 export default function ProjectsPage() {
   const {
+    filtered,
     loading,
     error,
-    filtered,
-    search,
-    setSearch,
     showModal,
-    form,
-    setForm,
-    editId,
+    editItem,
     saving,
     uploading,
+    search,
+    setSearch,
     openAdd,
     openEdit,
     closeModal,
     handleSave,
+    uploadThumbnail,
     handleDelete,
-    handleUploadThumbnail,
   } = useProjects();
 
   return (
@@ -32,19 +30,12 @@ export default function ProjectsPage() {
           <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Proyek</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400">Kelola portofolio proyek kamu</p>
         </div>
-        <button
-          onClick={openAdd}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
-        >
+        <button onClick={openAdd} className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700">
           + Tambah
         </button>
       </div>
 
-      {error && (
-        <div className="mb-4 rounded-lg bg-red-100 px-4 py-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">
-          {error}
-        </div>
-      )}
+      {error && <div className="mb-4 rounded-lg bg-red-100 px-4 py-3 text-sm text-red-700 dark:bg-red-900/30 dark:text-red-400">{error}</div>}
 
       <div className="mb-4">
         <input
@@ -55,19 +46,18 @@ export default function ProjectsPage() {
         />
       </div>
 
-      <ProjectGrid loading={loading} search={search} projects={filtered} onEdit={openEdit} onDelete={handleDelete} />
+      <ProjectGrid loading={loading} search={search} filtered={filtered} onEdit={openEdit} onDelete={handleDelete} />
 
-      <ProjectFormModal
-        open={showModal}
-        editId={editId}
-        form={form}
-        saving={saving}
-        uploading={uploading}
-        onChange={setForm}
-        onUploadThumbnail={handleUploadThumbnail}
-        onClose={closeModal}
-        onSave={handleSave}
-      />
+      {showModal && (
+        <ProjectFormModal
+          editItem={editItem}
+          saving={saving}
+          uploading={uploading}
+          onUploadThumbnail={uploadThumbnail}
+          onClose={closeModal}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }

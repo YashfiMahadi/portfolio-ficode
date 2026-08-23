@@ -1,43 +1,41 @@
 "use client";
 
 import { Plus } from "lucide-react";
-
 import { Button } from "@/shared/components/ui/button";
-
-import { useSkills } from "./hooks/use-skills";
-import { SkillsTable } from "./components/skills-table";
-import { SkillFormModal } from "./components/skill-form-modal";
+import { useSkills } from "@/app/(features)/(root)/portfolio/skills/hooks/use-skills";
+import { getSkillColumns } from "@/app/(features)/(root)/portfolio/skills/components/columns";
+import SkillsDataTable from "@/app/(features)/(root)/portfolio/skills/components/skills-data-table";
+import SkillFormModal from "@/app/(features)/(root)/portfolio/skills/components/skill-form-modal";
 
 export default function SkillsPage() {
   const {
+    skills,
     loading,
     error,
-    table,
+    showModal,
+    editItem,
+    saving,
+    sorting,
+    setSorting,
     globalFilter,
     setGlobalFilter,
-    showModal,
-    form,
-    setForm,
-    editId,
-    saving,
     openAdd,
+    openEdit,
     closeModal,
     handleSave,
+    handleDelete,
   } = useSkills();
+
+  const columns = getSkillColumns({ onEdit: openEdit, onDelete: handleDelete });
 
   return (
     <div className="p-4 md:p-6">
       {/* HEADER */}
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">
-            Keahlian / Skill
-          </h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            Kelola data keahlian kamu
-          </p>
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-white">Keahlian / Skill</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Kelola data keahlian kamu</p>
         </div>
-
         <Button onClick={openAdd}>
           <Plus className="mr-2 h-4 w-4" />
           Tambah Skill
@@ -52,23 +50,25 @@ export default function SkillsPage() {
       )}
 
       {/* DATATABLE */}
-      <SkillsTable
-        table={table}
+      <SkillsDataTable
+        data={skills}
+        columns={columns}
         loading={loading}
+        sorting={sorting}
+        onSortingChange={setSorting}
         globalFilter={globalFilter}
         onGlobalFilterChange={setGlobalFilter}
       />
 
       {/* MODAL */}
-      <SkillFormModal
-        open={showModal}
-        editId={editId}
-        form={form}
-        saving={saving}
-        onChange={setForm}
-        onClose={closeModal}
-        onSave={handleSave}
-      />
+      {showModal && (
+        <SkillFormModal
+          editItem={editItem}
+          saving={saving}
+          onClose={closeModal}
+          onSave={handleSave}
+        />
+      )}
     </div>
   );
 }

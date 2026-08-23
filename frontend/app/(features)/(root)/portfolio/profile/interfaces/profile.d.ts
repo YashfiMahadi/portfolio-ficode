@@ -1,8 +1,4 @@
-// Tipe data untuk fitur Profile (portfolio).
-// Dipakai oleh hooks/use-profile.ts, components/*, dan page.tsx
-// pada app/(features)/(root)/portfolio/profile.
-
-export interface Profile {
+export interface PortfolioProfile {
   id?: number;
   userId?: number;
   nama: string;
