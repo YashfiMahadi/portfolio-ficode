@@ -13,6 +13,15 @@ import {
 } from "@/shared/components/ui/form";
 import Input from "@/shared/components/form/input/input-field";
 import { Button } from "@/shared/components/ui/button";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { MonthYearPicker } from "@/shared/components/ui/month-year-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import type { Project } from "@/app/(features)/(root)/portfolio/projects/interfaces/project";
 import {
   projectSchema,
@@ -32,8 +41,6 @@ interface ProjectFormModalProps {
 const TEXT_FIELDS: { label: string; key: keyof ProjectFormValues; placeholder: string }[] = [
   { label: "Nama Proyek *", key: "namaProyek", placeholder: "Portfolio CV Digital" },
   { label: "Teknologi Digunakan", key: "teknologiDigunakan", placeholder: "Java, Spring Boot, MySQL, React" },
-  { label: "Tanggal Mulai", key: "tanggalMulai", placeholder: "2024-01" },
-  { label: "Tanggal Selesai", key: "tanggalSelesai", placeholder: "2024-06 / Sekarang" },
   { label: "Link GitHub", key: "linkGithub", placeholder: "https://github.com/..." },
   { label: "Link Demo", key: "linkDemo", placeholder: "https://..." },
 ];
@@ -88,7 +95,53 @@ export default function ProjectFormModal({
               </div>
             </div>
 
-            {TEXT_FIELDS.map(({ label, key, placeholder }) => (
+            {TEXT_FIELDS.slice(0, 2).map(({ label, key, placeholder }) => (
+              <FormField
+                key={key}
+                control={form.control}
+                name={key}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{label}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={placeholder} {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="tanggalMulai"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <FormControl>
+                      <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun mulai" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="tanggalSelesai"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Selesai</FormLabel>
+                    <FormControl>
+                      <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun selesai" allowPresent />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {TEXT_FIELDS.slice(2).map(({ label, key, placeholder }) => (
               <FormField
                 key={key}
                 control={form.control}
@@ -113,11 +166,16 @@ export default function ProjectFormModal({
                   <FormItem>
                     <FormLabel>Kategori</FormLabel>
                     <FormControl>
-                      <select {...field} value={field.value ?? ""}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                        <option value="">-- Pilih --</option>
-                        {kategoriList.map((k) => <option key={k} value={k}>{k}</option>)}
-                      </select>
+                      <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="-- Pilih --" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {kategoriList.map((k) => (
+                            <SelectItem key={k} value={k}>{k}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -130,11 +188,16 @@ export default function ProjectFormModal({
                   <FormItem>
                     <FormLabel>Status</FormLabel>
                     <FormControl>
-                      <select {...field} value={field.value ?? ""}
-                        className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                        <option value="">-- Pilih --</option>
-                        {statusList.map((s) => <option key={s} value={s}>{s}</option>)}
-                      </select>
+                      <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="-- Pilih --" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {statusList.map((s) => (
+                            <SelectItem key={s} value={s}>{s}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -149,8 +212,8 @@ export default function ProjectFormModal({
                 <FormItem>
                   <FormLabel>Deskripsi</FormLabel>
                   <FormControl>
-                    <textarea rows={3}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    <Textarea
+                      rows={3}
                       placeholder="Deskripsi proyek..."
                       {...field}
                       value={field.value ?? ""}

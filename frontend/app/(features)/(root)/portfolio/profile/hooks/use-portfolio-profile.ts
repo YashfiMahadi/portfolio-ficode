@@ -66,7 +66,7 @@ export function usePortfolioProfile() {
     if (!user) return;
     setUploading(true);
     try {
-      const url = await uploadAPI.uploadPhoto(file);
+      const url = await uploadAPI.uploadProfilePhoto(file);
       const updated = { ...emptyProfile, ...profile, fotoUrl: url };
       const res = await profileAPI.updateMyProfile(user.id, updated);
       if (res.status === "success") {

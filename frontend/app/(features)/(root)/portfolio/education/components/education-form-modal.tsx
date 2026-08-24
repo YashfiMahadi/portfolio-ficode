@@ -12,6 +12,15 @@ import {
 } from "@/shared/components/ui/form";
 import Input from "@/shared/components/form/input/input-field";
 import { Button } from "@/shared/components/ui/button";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { MonthYearPicker } from "@/shared/components/ui/month-year-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import type { Education } from "@/app/(features)/(root)/portfolio/education/interfaces/education";
 import {
   educationSchema,
@@ -30,8 +39,6 @@ const TEXT_FIELDS: { label: string; key: keyof EducationFormValues; placeholder:
   { label: "Nama Institusi *", key: "namaInstitusi", placeholder: "STMIK Mardira Indonesia" },
   { label: "Jurusan *", key: "jurusan", placeholder: "Teknik Informatika" },
   { label: "Lokasi", key: "lokasi", placeholder: "Bandung" },
-  { label: "Tanggal Mulai", key: "tanggalMulai", placeholder: "2022-09" },
-  { label: "Tanggal Selesai", key: "tanggalSelesai", placeholder: "2026-07 / Sekarang" },
   { label: "IPK (opsional)", key: "ipk", placeholder: "3.75" },
 ];
 
@@ -52,7 +59,7 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSave)} className="space-y-3">
-            {TEXT_FIELDS.map(({ label, key, placeholder }) => (
+            {TEXT_FIELDS.slice(0, 3).map(({ label, key, placeholder }) => (
               <FormField
                 key={key}
                 control={form.control}
@@ -69,6 +76,49 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
               />
             ))}
 
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="tanggalMulai"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <FormControl>
+                      <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun mulai" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="tanggalSelesai"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Selesai</FormLabel>
+                    <FormControl>
+                      <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun selesai" allowPresent />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            <FormField
+              control={form.control}
+              name="ipk"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>IPK (opsional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="3.75" {...field} value={field.value ?? ""} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
             <FormField
               control={form.control}
               name="jenjang"
@@ -76,11 +126,16 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
                 <FormItem>
                   <FormLabel>Jenjang</FormLabel>
                   <FormControl>
-                    <select {...field} value={field.value ?? ""}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                      <option value="">-- Pilih Jenjang --</option>
-                      {jenjangList.map((j) => <option key={j} value={j}>{j}</option>)}
-                    </select>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="-- Pilih Jenjang --" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {jenjangList.map((j) => (
+                          <SelectItem key={j} value={j}>{j}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -94,8 +149,8 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
                 <FormItem>
                   <FormLabel>Deskripsi</FormLabel>
                   <FormControl>
-                    <textarea rows={3}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    <Textarea
+                      rows={3}
                       placeholder="Deskripsi tambahan..."
                       {...field}
                       value={field.value ?? ""}

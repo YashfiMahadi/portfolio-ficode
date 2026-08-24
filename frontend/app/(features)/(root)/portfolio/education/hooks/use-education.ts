@@ -63,7 +63,6 @@ export function useEducation() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin hapus?")) return;
     try {
       await educationAPI.delete(id);
       fetchData();

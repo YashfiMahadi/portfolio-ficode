@@ -55,7 +55,6 @@ export function useExperience() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin hapus?")) return;
     try {
       await experienceAPI.delete(id);
       fetchData();

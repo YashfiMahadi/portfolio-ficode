@@ -2,6 +2,7 @@
 
 import type { Education } from "@/app/(features)/(root)/portfolio/education/interfaces/education";
 import { jenjangColor } from "@/app/(features)/(root)/portfolio/education/hooks/use-education";
+import ConfirmDeleteDialog from "@/shared/components/common/confirm-delete-dialog";
 
 interface EducationListProps {
   loading: boolean;
@@ -50,7 +51,11 @@ export default function EducationList({ loading, data, onEdit, onDelete }: Educa
             </div>
             <div className="flex gap-2">
               <button onClick={() => onEdit(item)} className="rounded bg-yellow-600 px-3 py-1 text-xs font-medium text-yellow-50 hover:bg-yellow-700">Edit</button>
-              <button onClick={() => onDelete(item.id!)} className="rounded bg-red-600 px-3 py-1 text-xs font-medium text-red-50 hover:bg-red-700">Hapus</button>
+              <ConfirmDeleteDialog
+                trigger={<button className="rounded bg-red-600 px-3 py-1 text-xs font-medium text-red-50 hover:bg-red-700">Hapus</button>}
+                description={`Riwayat pendidikan di "${item.namaInstitusi}" akan dihapus secara permanen.`}
+                onConfirm={() => onDelete(item.id!)}
+              />
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 "use client";
 
 import type { Experience } from "@/app/(features)/(root)/portfolio/experience/interfaces/experience";
+import ConfirmDeleteDialog from "@/shared/components/common/confirm-delete-dialog";
 
 interface ExperienceListProps {
   loading: boolean;
@@ -45,7 +46,11 @@ export default function ExperienceList({ loading, data, onEdit, onDelete }: Expe
             </div>
             <div className="flex gap-2">
               <button onClick={() => onEdit(item)} className="rounded bg-yellow-600 px-3 py-1 text-xs font-medium text-yellow-50 hover:bg-yellow-700">Edit</button>
-              <button onClick={() => onDelete(item.id!)} className="rounded bg-red-600 px-3 py-1 text-xs font-medium text-red-50 hover:bg-red-700">Hapus</button>
+              <ConfirmDeleteDialog
+                trigger={<button className="rounded bg-red-600 px-3 py-1 text-xs font-medium text-red-50 hover:bg-red-700">Hapus</button>}
+                description={`Pengalaman kerja di "${item.namaPerusahaan}" akan dihapus secara permanen.`}
+                onConfirm={() => onDelete(item.id!)}
+              />
             </div>
           </div>
         </div>

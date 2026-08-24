@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/shared/components/ui/button";
 import { Badge } from "@/shared/components/ui/badge";
+import ConfirmDeleteDialog from "@/shared/components/common/confirm-delete-dialog";
 import type { Skill } from "@/app/(features)/(root)/portfolio/skills/interfaces/skill";
 import { getLevelColor } from "@/app/(features)/(root)/portfolio/skills/hooks/use-skills";
 
@@ -78,9 +79,11 @@ export function getSkillColumns({ onEdit, onDelete }: GetColumnsArgs): ColumnDef
             <Button size="sm" variant="outline" onClick={() => onEdit(skill)}>
               Edit
             </Button>
-            <Button size="sm" variant="destructive" onClick={() => onDelete(skill.id!)}>
-              Hapus
-            </Button>
+            <ConfirmDeleteDialog
+              trigger={<Button size="sm" variant="destructive">Hapus</Button>}
+              description={`Skill "${skill.namaSkill}" akan dihapus secara permanen.`}
+              onConfirm={() => onDelete(skill.id!)}
+            />
           </div>
         );
       },

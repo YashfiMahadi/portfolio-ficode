@@ -22,14 +22,14 @@ export default function Error404() {
         <Image
           src="/images/error/404.svg"
           alt="404"
-          className="dark:hidden"
+          className="dark:hidden h-auto w-full"
           width={472}
           height={152}
         />
         <Image
           src="/images/error/404-dark.svg"
           alt="404"
-          className="hidden dark:block"
+          className="hidden dark:block h-auto w-full"
           width={472}
           height={152}
         />

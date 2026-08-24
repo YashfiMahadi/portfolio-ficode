@@ -12,6 +12,14 @@ import {
 } from "@/shared/components/ui/form";
 import Input from "@/shared/components/form/input/input-field";
 import { Button } from "@/shared/components/ui/button";
+import { MonthYearPicker } from "@/shared/components/ui/month-year-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import type { Certification } from "@/app/(features)/(root)/portfolio/certifications/interfaces/certification";
 import {
   certificationSchema,
@@ -29,8 +37,6 @@ interface CertificationFormModalProps {
 const TEXT_FIELDS: { label: string; key: keyof CertificationFormValues; placeholder: string }[] = [
   { label: "Nama Sertifikat *", key: "namaSertifikat", placeholder: "Java Programming Masterclass" },
   { label: "Penerbit *", key: "penerbit", placeholder: "Udemy / Google / Oracle" },
-  { label: "Tanggal Terbit", key: "tanggalTerbit", placeholder: "2024-03" },
-  { label: "Tanggal Kadaluarsa", key: "tanggalKadaluarsa", placeholder: "2027-03 (kosongkan jika selamanya)" },
   { label: "Nomor Sertifikat", key: "nomorSertifikat", placeholder: "UC-XXXXXXXX" },
   { label: "Link Sertifikat", key: "linkSertifikat", placeholder: "https://..." },
 ];
@@ -50,7 +56,53 @@ export default function CertificationFormModal({ editItem, saving, onClose, onSa
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSave)} className="space-y-3">
-            {TEXT_FIELDS.map(({ label, key, placeholder }) => (
+            {TEXT_FIELDS.slice(0, 2).map(({ label, key, placeholder }) => (
+              <FormField
+                key={key}
+                control={form.control}
+                name={key}
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{label}</FormLabel>
+                    <FormControl>
+                      <Input placeholder={placeholder} {...field} value={field.value ?? ""} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            ))}
+
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="tanggalTerbit"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Terbit</FormLabel>
+                    <FormControl>
+                      <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun terbit" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="tanggalKadaluarsa"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Kadaluarsa</FormLabel>
+                    <FormControl>
+                      <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Kosongkan jika selamanya" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
+            {TEXT_FIELDS.slice(2).map(({ label, key, placeholder }) => (
               <FormField
                 key={key}
                 control={form.control}
@@ -74,11 +126,16 @@ export default function CertificationFormModal({ editItem, saving, onClose, onSa
                 <FormItem>
                   <FormLabel>Kategori</FormLabel>
                   <FormControl>
-                    <select {...field} value={field.value ?? ""}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                      <option value="">-- Pilih Kategori --</option>
-                      {kategoriList.map((k) => <option key={k} value={k}>{k}</option>)}
-                    </select>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="-- Pilih Kategori --" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {kategoriList.map((k) => (
+                          <SelectItem key={k} value={k}>{k}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

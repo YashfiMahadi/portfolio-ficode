@@ -2,6 +2,7 @@
 
 import type { Certification } from "@/app/(features)/(root)/portfolio/certifications/interfaces/certification";
 import { penerbitColor } from "@/app/(features)/(root)/portfolio/certifications/hooks/use-certifications";
+import ConfirmDeleteDialog from "@/shared/components/common/confirm-delete-dialog";
 
 interface CertificationGridProps {
   loading: boolean;
@@ -47,7 +48,11 @@ export default function CertificationGrid({ loading, data, onEdit, onDelete }: C
             )}
             <div className="mt-3 flex gap-2 border-t border-gray-100 pt-3 dark:border-gray-700">
               <button onClick={() => onEdit(item)} className="flex-1 rounded bg-yellow-600 py-1 text-xs font-medium text-yellow-50 hover:bg-yellow-700">Edit</button>
-              <button onClick={() => onDelete(item.id!)} className="flex-1 rounded bg-red-600 py-1 text-xs font-medium text-red-50 hover:bg-red-700">Hapus</button>
+              <ConfirmDeleteDialog
+                trigger={<button className="flex-1 rounded bg-red-600 py-1 text-xs font-medium text-red-50 hover:bg-red-700">Hapus</button>}
+                description={`Sertifikat "${item.namaSertifikat}" akan dihapus secara permanen.`}
+                onConfirm={() => onDelete(item.id!)}
+              />
             </div>
           </div>
         ))

@@ -2,7 +2,7 @@
 // Service layer untuk komunikasi dengan backend Spring Boot
 // Base URL backend
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api" || "http://127.0.0.1:8000/api";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://portfolio-ficode-production.up.railway.app/api";
 
 // ===== Helper fetch =====
 async function apiFetch(endpoint: string, options?: RequestInit) {
@@ -75,18 +75,27 @@ export const certificationAPI = {
 
 // ===== UPLOAD =====
 export const uploadAPI = {
-  uploadPhoto: async (file: File): Promise<string> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    // Pakai BASE_URL yang sama dengan endpoint data lain, supaya foto
-    // yang diupload selalu tersimpan di backend yang sama dengan yang
-    // dipakai untuk menampilkan data (bukan localhost yang terpisah).
-    const res = await fetch(`${BASE_URL}/upload/photo`, {
-      method: "POST",
-      body: formData,
-    });
-    const data = await res.json();
-    if (data.status === "success") return data.url;
-    throw new Error(data.pesan);
+  /** Upload foto profile -> masuk ke folder "profile" di Cloudinary. */
+  uploadProfilePhoto: async (file: File): Promise<string> => {
+    return uploadFile(file, "/upload/profile");
+  },
+  /** Upload thumbnail proyek -> masuk ke folder "project" di Cloudinary. */
+  uploadProjectPhoto: async (file: File): Promise<string> => {
+    return uploadFile(file, "/upload/project");
   },
 };
+
+async function uploadFile(file: File, endpoint: string): Promise<string> {
+  const formData = new FormData();
+  formData.append("file", file);
+  // Pakai BASE_URL yang sama dengan endpoint data lain, supaya foto
+  // yang diupload selalu tersimpan di backend yang sama dengan yang
+  // dipakai untuk menampilkan data (bukan localhost yang terpisah).
+  const res = await fetch(`${BASE_URL}${endpoint}`, {
+    method: "POST",
+    body: formData,
+  });
+  const data = await res.json();
+  if (data.status === "success") return data.url;
+  throw new Error(data.pesan);
+}

@@ -71,7 +71,7 @@ export function useProjects() {
   const uploadThumbnail = async (file: File): Promise<string | null> => {
     setUploading(true);
     try {
-      return await uploadAPI.uploadPhoto(file);
+      return await uploadAPI.uploadProjectPhoto(file);
     } catch {
       alert("Gagal upload thumbnail.");
       return null;
@@ -81,7 +81,6 @@ export function useProjects() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin hapus proyek ini?")) return;
     try {
       await projectAPI.delete(id);
       fetchData();

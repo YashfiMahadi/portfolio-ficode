@@ -12,6 +12,13 @@ import {
 } from "@/shared/components/ui/form";
 import Input from "@/shared/components/form/input/input-field";
 import { Button } from "@/shared/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import type { Skill } from "@/app/(features)/(root)/portfolio/skills/interfaces/skill";
 import {
   skillSchema,
@@ -66,17 +73,18 @@ export default function SkillFormModal({ editItem, saving, onClose, onSave }: Sk
                 <FormItem>
                   <FormLabel>Kategori *</FormLabel>
                   <FormControl>
-                    <select
-                      {...field}
-                      className="w-full rounded-md border border-gray-300 bg-white px-3 py-2 text-sm outline-none focus:border-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
-                    >
-                      <option value="">-- Pilih Kategori --</option>
-                      {kategoriList.map((kategori) => (
-                        <option key={kategori} value={kategori}>
-                          {kategori}
-                        </option>
-                      ))}
-                    </select>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="-- Pilih Kategori --" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {kategoriList.map((kategori) => (
+                          <SelectItem key={kategori} value={kategori}>
+                            {kategori}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>

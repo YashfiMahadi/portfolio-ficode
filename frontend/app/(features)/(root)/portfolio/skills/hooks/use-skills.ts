@@ -97,7 +97,6 @@ export function useSkills() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin hapus skill ini?")) return;
     try {
       await skillAPI.delete(id);
       await fetchSkills();

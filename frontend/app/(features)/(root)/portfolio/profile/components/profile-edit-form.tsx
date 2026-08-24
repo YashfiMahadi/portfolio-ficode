@@ -13,6 +13,7 @@ import {
 } from "@/shared/components/ui/form";
 import Input from "@/shared/components/form/input/input-field";
 import { Button } from "@/shared/components/ui/button";
+import { Textarea } from "@/shared/components/ui/textarea";
 import type { PortfolioProfile } from "@/app/(features)/(root)/portfolio/profile/interfaces/profile";
 import {
   portfolioProfileSchema,
@@ -94,9 +95,8 @@ export default function ProfileEditForm({ profile, saving, successMsg, error, on
                 <FormItem className="sm:col-span-2">
                   <FormLabel>Tentang Saya</FormLabel>
                   <FormControl>
-                    <textarea
+                    <Textarea
                       rows={4}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
                       placeholder="Deskripsi singkat tentang dirimu..."
                       {...field}
                       value={field.value ?? ""}

@@ -12,6 +12,15 @@ import {
 } from "@/shared/components/ui/form";
 import Input from "@/shared/components/form/input/input-field";
 import { Button } from "@/shared/components/ui/button";
+import { Textarea } from "@/shared/components/ui/textarea";
+import { MonthYearPicker } from "@/shared/components/ui/month-year-picker";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/shared/components/ui/select";
 import type { Experience } from "@/app/(features)/(root)/portfolio/experience/interfaces/experience";
 import {
   experienceSchema,
@@ -30,14 +39,29 @@ const TEXT_FIELDS: { label: string; key: keyof ExperienceFormValues; placeholder
   { label: "Nama Perusahaan *", key: "namaPerusahaan", placeholder: "PT. Contoh" },
   { label: "Posisi/Jabatan *", key: "posisi", placeholder: "Backend Developer" },
   { label: "Lokasi", key: "lokasiPerusahaan", placeholder: "Bandung" },
-  { label: "Tanggal Mulai", key: "tanggalMulai", placeholder: "2023-01" },
-  { label: "Tanggal Selesai", key: "tanggalSelesai", placeholder: "2024-06 / Sekarang" },
 ];
 
 export default function ExperienceFormModal({ editItem, saving, onClose, onSave }: ExperienceFormModalProps) {
+  const toMonthYear = (value?: string | null) => {
+    if (!value) return "";
+    if (value === "Sekarang") return value;
+
+    // API bisa mengirim yyyy-MM, yyyy-MM-dd, atau ISO timestamp.
+    // Form ini hanya menyimpan bulan + tahun.
+    const match = value.match(/^(\d{4})-(0[1-9]|1[0-2])/);
+    return match ? `${match[1]}-${match[2]}` : "";
+  };
+
   const form = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceSchema),
-    defaultValues: editItem ? { ...emptyExperience, ...editItem } : emptyExperience,
+    defaultValues: editItem
+      ? {
+          ...emptyExperience,
+          ...editItem,
+          tanggalMulai: toMonthYear(editItem.tanggalMulai),
+          tanggalSelesai: toMonthYear(editItem.tanggalSelesai),
+        }
+      : emptyExperience,
   });
 
   return (
@@ -66,6 +90,35 @@ export default function ExperienceFormModal({ editItem, saving, onClose, onSave 
               />
             ))}
 
+            <div className="grid grid-cols-2 gap-3">
+              <FormField
+                control={form.control}
+                name="tanggalMulai"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <FormControl>
+                      <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun mulai" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="tanggalSelesai"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Tanggal Selesai</FormLabel>
+                    <FormControl>
+                      <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun selesai" allowPresent />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+
             <FormField
               control={form.control}
               name="jenisKerja"
@@ -73,11 +126,16 @@ export default function ExperienceFormModal({ editItem, saving, onClose, onSave 
                 <FormItem>
                   <FormLabel>Jenis Kerja</FormLabel>
                   <FormControl>
-                    <select {...field} value={field.value ?? ""}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white">
-                      <option value="">-- Pilih --</option>
-                      {jenisKerjaList.map((j) => <option key={j} value={j}>{j}</option>)}
-                    </select>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="-- Pilih --" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {jenisKerjaList.map((j) => (
+                          <SelectItem key={j} value={j}>{j}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -91,8 +149,8 @@ export default function ExperienceFormModal({ editItem, saving, onClose, onSave 
                 <FormItem>
                   <FormLabel>Deskripsi</FormLabel>
                   <FormControl>
-                    <textarea rows={3}
-                      className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-gray-600 dark:bg-gray-800 dark:text-white"
+                    <Textarea
+                      rows={3}
                       placeholder="Deskripsi pekerjaan..."
                       {...field}
                       value={field.value ?? ""}

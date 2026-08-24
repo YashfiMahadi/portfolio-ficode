@@ -64,7 +64,6 @@ export function useCertifications() {
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Yakin hapus sertifikasi ini?")) return;
     try {
       await certificationAPI.delete(id);
       fetchData();
