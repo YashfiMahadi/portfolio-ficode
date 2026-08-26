@@ -10,12 +10,17 @@ function Select(props: React.ComponentProps<typeof SelectPrimitive.Root>) {
   return <SelectPrimitive.Root data-slot="select" {...props} />
 }
 
-function SelectTrigger({ className, children, ...props }: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
+function SelectTrigger({ className, children, "aria-invalid": ariaInvalid, ...props }: React.ComponentProps<typeof SelectPrimitive.Trigger>) {
+  const isInvalid = ariaInvalid === true || ariaInvalid === "true";
+
   return (
     <SelectPrimitive.Trigger
       data-slot="select-trigger"
+      aria-invalid={isInvalid}
       className={cn(
         "flex h-11 w-full items-center justify-between gap-2 rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 shadow-theme-xs outline-none focus:border-brand-300 focus:ring-3 focus:ring-brand-500/10 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:focus:border-brand-800 [&>span]:line-clamp-1",
+        isInvalid &&
+          "border-error-500 text-error-800 focus:border-error-500 focus:ring-error-500/10 dark:border-error-500 dark:text-error-400",
         className
       )}
       {...props}

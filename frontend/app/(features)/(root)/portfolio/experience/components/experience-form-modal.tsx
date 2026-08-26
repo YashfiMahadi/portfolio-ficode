@@ -35,33 +35,16 @@ interface ExperienceFormModalProps {
   onSave: (values: ExperienceFormValues) => void;
 }
 
-const TEXT_FIELDS: { label: string; key: keyof ExperienceFormValues; placeholder: string }[] = [
-  { label: "Nama Perusahaan *", key: "namaPerusahaan", placeholder: "PT. Contoh" },
-  { label: "Posisi/Jabatan *", key: "posisi", placeholder: "Backend Developer" },
+const TEXT_FIELDS: { label: string; key: keyof ExperienceFormValues; placeholder: string; required?: boolean }[] = [
+  { label: "Nama Perusahaan", key: "namaPerusahaan", placeholder: "PT. Contoh", required: true },
+  { label: "Posisi/Jabatan", key: "posisi", placeholder: "Backend Developer", required: true },
   { label: "Lokasi", key: "lokasiPerusahaan", placeholder: "Bandung" },
 ];
 
 export default function ExperienceFormModal({ editItem, saving, onClose, onSave }: ExperienceFormModalProps) {
-  const toMonthYear = (value?: string | null) => {
-    if (!value) return "";
-    if (value === "Sekarang") return value;
-
-    // API bisa mengirim yyyy-MM, yyyy-MM-dd, atau ISO timestamp.
-    // Form ini hanya menyimpan bulan + tahun.
-    const match = value.match(/^(\d{4})-(0[1-9]|1[0-2])/);
-    return match ? `${match[1]}-${match[2]}` : "";
-  };
-
   const form = useForm<ExperienceFormValues>({
     resolver: zodResolver(experienceSchema),
-    defaultValues: editItem
-      ? {
-          ...emptyExperience,
-          ...editItem,
-          tanggalMulai: toMonthYear(editItem.tanggalMulai),
-          tanggalSelesai: toMonthYear(editItem.tanggalSelesai),
-        }
-      : emptyExperience,
+    defaultValues: editItem ? { ...emptyExperience, ...editItem } : emptyExperience,
   });
 
   return (
@@ -73,14 +56,14 @@ export default function ExperienceFormModal({ editItem, saving, onClose, onSave 
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSave)} className="space-y-3">
-            {TEXT_FIELDS.map(({ label, key, placeholder }) => (
+            {TEXT_FIELDS.map(({ label, key, placeholder, required }) => (
               <FormField
                 key={key}
                 control={form.control}
                 name={key}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel aria-required={required}>{label}</FormLabel>
                     <FormControl>
                       <Input placeholder={placeholder} {...field} value={field.value ?? ""} />
                     </FormControl>
@@ -96,7 +79,7 @@ export default function ExperienceFormModal({ editItem, saving, onClose, onSave 
                 name="tanggalMulai"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <FormLabel aria-required>Tanggal Mulai</FormLabel>
                     <FormControl>
                       <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun mulai" />
                     </FormControl>
@@ -109,7 +92,7 @@ export default function ExperienceFormModal({ editItem, saving, onClose, onSave 
                 name="tanggalSelesai"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tanggal Selesai</FormLabel>
+                    <FormLabel aria-required>Tanggal Selesai</FormLabel>
                     <FormControl>
                       <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun selesai" allowPresent />
                     </FormControl>
@@ -124,19 +107,19 @@ export default function ExperienceFormModal({ editItem, saving, onClose, onSave 
               name="jenisKerja"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Jenis Kerja</FormLabel>
-                  <FormControl>
-                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                  <FormLabel aria-required>Jenis Kerja</FormLabel>
+                  <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="-- Pilih --" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {jenisKerjaList.map((j) => (
-                          <SelectItem key={j} value={j}>{j}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
+                    </FormControl>
+                    <SelectContent>
+                      {jenisKerjaList.map((j) => (
+                        <SelectItem key={j} value={j}>{j}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

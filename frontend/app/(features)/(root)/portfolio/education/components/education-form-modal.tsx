@@ -35,11 +35,12 @@ interface EducationFormModalProps {
   onSave: (values: EducationFormValues) => void;
 }
 
-const TEXT_FIELDS: { label: string; key: keyof EducationFormValues; placeholder: string }[] = [
-  { label: "Nama Institusi *", key: "namaInstitusi", placeholder: "STMIK Mardira Indonesia" },
-  { label: "Jurusan *", key: "jurusan", placeholder: "Teknik Informatika" },
+// required: true → tampilkan tanda * merah otomatis lewat aria-required
+const TEXT_FIELDS: { label: string; key: keyof EducationFormValues; placeholder: string; required?: boolean }[] = [
+  { label: "Nama Institusi", key: "namaInstitusi", placeholder: "STMIK Mardira Indonesia", required: true },
+  { label: "Jurusan", key: "jurusan", placeholder: "Teknik Informatika", required: true },
   { label: "Lokasi", key: "lokasi", placeholder: "Bandung" },
-  { label: "IPK (opsional)", key: "ipk", placeholder: "3.75" },
+  { label: "IPK", key: "ipk", placeholder: "3.75" },
 ];
 
 export default function EducationFormModal({ editItem, saving, onClose, onSave }: EducationFormModalProps) {
@@ -59,14 +60,14 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSave)} className="space-y-3">
-            {TEXT_FIELDS.slice(0, 3).map(({ label, key, placeholder }) => (
+            {TEXT_FIELDS.slice(0, 3).map(({ label, key, placeholder, required }) => (
               <FormField
                 key={key}
                 control={form.control}
                 name={key}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel aria-required={required}>{label}</FormLabel>
                     <FormControl>
                       <Input placeholder={placeholder} {...field} value={field.value ?? ""} />
                     </FormControl>
@@ -82,7 +83,7 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
                 name="tanggalMulai"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <FormLabel aria-required>Tanggal Mulai</FormLabel>
                     <FormControl>
                       <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun mulai" />
                     </FormControl>
@@ -95,7 +96,7 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
                 name="tanggalSelesai"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tanggal Selesai</FormLabel>
+                    <FormLabel aria-required>Tanggal Selesai</FormLabel>
                     <FormControl>
                       <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun selesai" allowPresent />
                     </FormControl>
@@ -110,7 +111,7 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
               name="ipk"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>IPK (opsional)</FormLabel>
+                  <FormLabel>IPK</FormLabel>
                   <FormControl>
                     <Input placeholder="3.75" {...field} value={field.value ?? ""} />
                   </FormControl>
@@ -124,19 +125,19 @@ export default function EducationFormModal({ editItem, saving, onClose, onSave }
               name="jenjang"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Jenjang</FormLabel>
-                  <FormControl>
-                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                  <FormLabel aria-required>Jenjang</FormLabel>
+                  <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="-- Pilih Jenjang --" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {jenjangList.map((j) => (
-                          <SelectItem key={j} value={j}>{j}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
+                    </FormControl>
+                    <SelectContent>
+                      {jenjangList.map((j) => (
+                        <SelectItem key={j} value={j}>{j}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

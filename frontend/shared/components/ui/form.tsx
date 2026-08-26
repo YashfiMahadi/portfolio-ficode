@@ -15,6 +15,23 @@ import Label from "@/shared/components/form/label";
 
 const Form = FormProvider;
 
+/**
+ * Slot minimal ala Radix: mengoper prop langsung ke elemen anak tunggal
+ * (bukan membungkusnya dengan <div>), supaya atribut seperti aria-invalid
+ * benar-benar sampai ke elemen visual (Input/Select/dst), bukan cuma
+ * nempel di pembungkus yang tidak terlihat. `ref` milik anak (mis. ref
+ * dari react-hook-form) sengaja tidak disentuh sama sekali di sini.
+ */
+function Slot({ children, className, ...props }: React.HTMLAttributes<HTMLElement> & { children: React.ReactElement }) {
+  if (!React.isValidElement(children)) return null;
+  const childProps = children.props as Record<string, unknown>;
+  return React.cloneElement(children as React.ReactElement<any>, {
+    ...props,
+    ...childProps,
+    className: cn(className, childProps.className as string),
+  });
+}
+
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
@@ -97,12 +114,12 @@ function FormLabel({
   );
 }
 
-function FormControl({ ...props }: React.ComponentProps<"div">) {
+function FormControl({ ...props }: React.ComponentProps<typeof Slot>) {
   const { error, formItemId, formDescriptionId, formMessageId } =
     useFormField();
 
   return (
-    <div
+    <Slot
       id={formItemId}
       aria-describedby={
         !error

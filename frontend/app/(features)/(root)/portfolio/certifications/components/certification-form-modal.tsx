@@ -34,9 +34,12 @@ interface CertificationFormModalProps {
   onSave: (values: CertificationFormValues) => void;
 }
 
-const TEXT_FIELDS: { label: string; key: keyof CertificationFormValues; placeholder: string }[] = [
-  { label: "Nama Sertifikat *", key: "namaSertifikat", placeholder: "Java Programming Masterclass" },
-  { label: "Penerbit *", key: "penerbit", placeholder: "Udemy / Google / Oracle" },
+const TOP_FIELDS: { label: string; key: keyof CertificationFormValues; placeholder: string; required?: boolean }[] = [
+  { label: "Nama Sertifikat", key: "namaSertifikat", placeholder: "Java Programming Masterclass", required: true },
+  { label: "Penerbit", key: "penerbit", placeholder: "Udemy / Google / Oracle", required: true },
+];
+
+const BOTTOM_FIELDS: { label: string; key: keyof CertificationFormValues; placeholder: string }[] = [
   { label: "Nomor Sertifikat", key: "nomorSertifikat", placeholder: "UC-XXXXXXXX" },
   { label: "Link Sertifikat", key: "linkSertifikat", placeholder: "https://..." },
 ];
@@ -56,14 +59,14 @@ export default function CertificationFormModal({ editItem, saving, onClose, onSa
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSave)} className="space-y-3">
-            {TEXT_FIELDS.slice(0, 2).map(({ label, key, placeholder }) => (
+            {TOP_FIELDS.map(({ label, key, placeholder, required }) => (
               <FormField
                 key={key}
                 control={form.control}
                 name={key}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel aria-required={required}>{label}</FormLabel>
                     <FormControl>
                       <Input placeholder={placeholder} {...field} value={field.value ?? ""} />
                     </FormControl>
@@ -79,7 +82,7 @@ export default function CertificationFormModal({ editItem, saving, onClose, onSa
                 name="tanggalTerbit"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tanggal Terbit</FormLabel>
+                    <FormLabel aria-required>Tanggal Terbit</FormLabel>
                     <FormControl>
                       <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun terbit" />
                     </FormControl>
@@ -102,7 +105,7 @@ export default function CertificationFormModal({ editItem, saving, onClose, onSa
               />
             </div>
 
-            {TEXT_FIELDS.slice(2).map(({ label, key, placeholder }) => (
+            {BOTTOM_FIELDS.map(({ label, key, placeholder }) => (
               <FormField
                 key={key}
                 control={form.control}
@@ -125,18 +128,18 @@ export default function CertificationFormModal({ editItem, saving, onClose, onSa
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Kategori</FormLabel>
-                  <FormControl>
-                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                  <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="-- Pilih Kategori --" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {kategoriList.map((k) => (
-                          <SelectItem key={k} value={k}>{k}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
+                    </FormControl>
+                    <SelectContent>
+                      {kategoriList.map((k) => (
+                        <SelectItem key={k} value={k}>{k}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}

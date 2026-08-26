@@ -3,6 +3,7 @@
 import * as React from "react"
 
 import { cn } from "@/shared/lib/utils"
+import { parseMonthYear } from "@/shared/lib/parse-month-year"
 import {
   Select,
   SelectContent,
@@ -20,6 +21,8 @@ interface MonthYearPickerProps {
   /** Tampilkan checkbox "Masih berlangsung" yang mengisi value dengan "Sekarang". */
   allowPresent?: boolean
   className?: string
+  /** Disuntik otomatis oleh <FormControl> saat field ini invalid. */
+  "aria-invalid"?: boolean | "true" | "false"
 }
 
 const BULAN = [
@@ -27,9 +30,14 @@ const BULAN = [
   "Juli", "Agustus", "September", "Oktober", "November", "Desember",
 ];
 
+// Dipakai sebagai prop `items` pada <Select> di bawah, supaya
+// <SelectValue> menampilkan LABEL bulan ("Januari"), bukan index
+// mentahnya ("0") — tanpa ini Base UI Select cuma nampilin raw value.
+const BULAN_ITEMS = Object.fromEntries(BULAN.map((bulan, index) => [String(index), bulan]));
+
 const CURRENT_YEAR = new Date().getFullYear();
 // Rentang tahun wajar untuk riwayat pendidikan/kerja/sertifikasi/proyek.
-const TAHUN_LIST = Array.from({ length: 60 }, (_, i) => String(CURRENT_YEAR + 5 - i));
+const TAHUN_LIST = Array.from({ length: 20 }, (_, i) => String(CURRENT_YEAR + 5 - i));
 
 /**
  * Picker bulan + tahun (dua dropdown terpisah), pengganti input teks
@@ -44,15 +52,19 @@ export function MonthYearPicker({
   placeholder = "Pilih bulan & tahun",
   allowPresent = false,
   className,
+  "aria-invalid": ariaInvalid,
 }: MonthYearPickerProps) {
+  const isInvalid = ariaInvalid === true || ariaInvalid === "true";
   const isPresent = value === "Sekarang";
 
-  // Backend kadang mengembalikan tanggal lengkap (yyyy-MM-dd / ISO),
-  // sedangkan field ini hanya butuh bulan + tahun. Normalisasi supaya
-  // nilai lama tetap terbaca saat form dibuka untuk edit.
-  const match = value && !isPresent ? value.match(/^(\d{4})-(0[1-9]|1[0-2])/) : null;
-  const selectedYear = match?.[1];
-  const selectedMonthIndex = match ? Number(match[2]) - 1 : undefined;
+  // Backend/data lama kadang menyimpan format tanggal yang beda-beda
+  // (dulu field ini masih input teks bebas). Parser di bawah ini
+  // menangani beberapa variasi format supaya value lama tetap terbaca.
+  const parsed = value && !isPresent ? parseMonthYear(value) : {};
+  const selectedYear = parsed.year;
+  const selectedMonthIndex = parsed.month;
+  // Tahun ketemu tapi bulan tidak terbaca dari data lama -> beri tahu user.
+  const monthUnknown = !!selectedYear && selectedMonthIndex === undefined;
 
   const setMonth = (monthIndex: number) => {
     const year = selectedYear ?? String(CURRENT_YEAR);
@@ -71,8 +83,9 @@ export function MonthYearPicker({
           value={selectedMonthIndex !== undefined ? String(selectedMonthIndex) : ""}
           onValueChange={(v) => setMonth(Number(v))}
           disabled={isPresent}
+          items={BULAN_ITEMS}
         >
-          <SelectTrigger>
+          <SelectTrigger aria-invalid={isInvalid}>
             <SelectValue placeholder="Bulan" />
           </SelectTrigger>
           <SelectContent>
@@ -83,7 +96,7 @@ export function MonthYearPicker({
         </Select>
 
         <Select value={selectedYear ?? ""} onValueChange={(v) => setYear(v as string)} disabled={isPresent}>
-          <SelectTrigger>
+          <SelectTrigger aria-invalid={isInvalid}>
             <SelectValue placeholder="Tahun" />
           </SelectTrigger>
           <SelectContent>
@@ -96,6 +109,11 @@ export function MonthYearPicker({
 
       {!selectedYear && !isPresent && (
         <p className="text-xs text-gray-400">{placeholder}</p>
+      )}
+      {monthUnknown && (
+        <p className="text-xs text-amber-500">
+          Bulan tidak terbaca dari data lama, silakan pilih ulang bulannya.
+        </p>
       )}
 
       {allowPresent && (

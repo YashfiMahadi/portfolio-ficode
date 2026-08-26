@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import Image from "next/image";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -38,9 +39,12 @@ interface ProjectFormModalProps {
   onSave: (values: ProjectFormValues) => void;
 }
 
-const TEXT_FIELDS: { label: string; key: keyof ProjectFormValues; placeholder: string }[] = [
-  { label: "Nama Proyek *", key: "namaProyek", placeholder: "Portfolio CV Digital" },
-  { label: "Teknologi Digunakan", key: "teknologiDigunakan", placeholder: "Java, Spring Boot, MySQL, React" },
+const TOP_FIELDS: { label: string; key: keyof ProjectFormValues; placeholder: string; required?: boolean }[] = [
+  { label: "Nama Proyek", key: "namaProyek", placeholder: "Portfolio CV Digital", required: true },
+  { label: "Teknologi Digunakan", key: "teknologiDigunakan", placeholder: "Java, Spring Boot, MySQL, React", required: true },
+];
+
+const LINK_FIELDS: { label: string; key: keyof ProjectFormValues; placeholder: string }[] = [
   { label: "Link GitHub", key: "linkGithub", placeholder: "https://github.com/..." },
   { label: "Link Demo", key: "linkDemo", placeholder: "https://..." },
 ];
@@ -54,6 +58,22 @@ export default function ProjectFormModal({
   });
 
   const gambarUrl = form.watch("gambarUrl");
+
+  // Sinkronkan Status Proyek otomatis mengikuti Tanggal Selesai, supaya
+  // dua field ini tidak pernah kontradiktif (mis. sudah ada tanggal
+  // selesai tapi status masih "Dalam Pengerjaan"). User tetap bisa
+  // override manual sesudahnya kalau memang perlu (mis. "Ditangguhkan").
+  useEffect(() => {
+    const subscription = form.watch((values, { name }) => {
+      if (name !== "tanggalSelesai") return;
+      if (values.tanggalSelesai === "Sekarang") {
+        form.setValue("statusProyek", "Dalam Pengerjaan", { shouldValidate: true });
+      } else if (values.tanggalSelesai) {
+        form.setValue("statusProyek", "Selesai", { shouldValidate: true });
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [form]);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -95,14 +115,14 @@ export default function ProjectFormModal({
               </div>
             </div>
 
-            {TEXT_FIELDS.slice(0, 2).map(({ label, key, placeholder }) => (
+            {TOP_FIELDS.map(({ label, key, placeholder, required }) => (
               <FormField
                 key={key}
                 control={form.control}
                 name={key}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel aria-required={required}>{label}</FormLabel>
                     <FormControl>
                       <Input placeholder={placeholder} {...field} value={field.value ?? ""} />
                     </FormControl>
@@ -118,7 +138,7 @@ export default function ProjectFormModal({
                 name="tanggalMulai"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tanggal Mulai</FormLabel>
+                    <FormLabel aria-required>Tanggal Mulai</FormLabel>
                     <FormControl>
                       <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun mulai" />
                     </FormControl>
@@ -131,7 +151,7 @@ export default function ProjectFormModal({
                 name="tanggalSelesai"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Tanggal Selesai</FormLabel>
+                    <FormLabel aria-required>Tanggal Selesai</FormLabel>
                     <FormControl>
                       <MonthYearPicker value={field.value ?? ""} onChange={field.onChange} placeholder="Bulan & tahun selesai" allowPresent />
                     </FormControl>
@@ -141,7 +161,7 @@ export default function ProjectFormModal({
               />
             </div>
 
-            {TEXT_FIELDS.slice(2).map(({ label, key, placeholder }) => (
+            {LINK_FIELDS.map(({ label, key, placeholder }) => (
               <FormField
                 key={key}
                 control={form.control}
@@ -165,18 +185,18 @@ export default function ProjectFormModal({
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Kategori</FormLabel>
-                    <FormControl>
-                      <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="-- Pilih --" />
                         </SelectTrigger>
-                        <SelectContent>
-                          {kategoriList.map((k) => (
-                            <SelectItem key={k} value={k}>{k}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
+                      </FormControl>
+                      <SelectContent>
+                        {kategoriList.map((k) => (
+                          <SelectItem key={k} value={k}>{k}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -186,19 +206,20 @@ export default function ProjectFormModal({
                 name="statusProyek"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Status</FormLabel>
-                    <FormControl>
-                      <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                    <FormLabel aria-required>Status</FormLabel>
+                    <Select value={field.value ?? ""} onValueChange={field.onChange}>
+                      <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="-- Pilih --" />
                         </SelectTrigger>
-                        <SelectContent>
-                          {statusList.map((s) => (
-                            <SelectItem key={s} value={s}>{s}</SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
+                      </FormControl>
+                      <SelectContent>
+                        {statusList.map((s) => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <p className="text-xs text-gray-400">Terisi otomatis dari Tanggal Selesai, bisa diubah manual.</p>
                     <FormMessage />
                   </FormItem>
                 )}
@@ -210,7 +231,7 @@ export default function ProjectFormModal({
               name="deskripsi"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Deskripsi</FormLabel>
+                  <FormLabel aria-required>Deskripsi</FormLabel>
                   <FormControl>
                     <Textarea
                       rows={3}

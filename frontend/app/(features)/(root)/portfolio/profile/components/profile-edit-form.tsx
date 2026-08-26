@@ -29,11 +29,11 @@ interface ProfileEditFormProps {
   onSave: (values: PortfolioProfileFormValues) => void;
 }
 
-const TEXT_FIELDS: { label: string; key: keyof PortfolioProfileFormValues; placeholder: string; span?: boolean }[] = [
-  { label: "Nama Lengkap *", key: "nama", placeholder: "Nama kamu" },
-  { label: "Jabatan *", key: "jabatan", placeholder: "Backend Developer" },
-  { label: "Email", key: "email", placeholder: "email@kamu.com" },
-  { label: "Telepon", key: "telepon", placeholder: "08123456789" },
+const TEXT_FIELDS: { label: string; key: keyof PortfolioProfileFormValues; placeholder: string; span?: boolean; required?: boolean }[] = [
+  { label: "Nama Lengkap", key: "nama", placeholder: "Nama kamu", required: true },
+  { label: "Jabatan", key: "jabatan", placeholder: "Backend Developer", required: true },
+  { label: "Email", key: "email", placeholder: "email@kamu.com", required: true },
+  { label: "Telepon", key: "telepon", placeholder: "08123456789", required: true },
   { label: "Kota", key: "kota", placeholder: "Bandung" },
   { label: "Provinsi", key: "provinsi", placeholder: "Jawa Barat" },
   { label: "Alamat", key: "alamat", placeholder: "Jl. Contoh No. 1", span: true },
@@ -71,14 +71,14 @@ export default function ProfileEditForm({ profile, saving, successMsg, error, on
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSave)}>
           <div className="grid gap-4 sm:grid-cols-2">
-            {TEXT_FIELDS.map(({ label, key, placeholder, span }) => (
+            {TEXT_FIELDS.map(({ label, key, placeholder, span, required }) => (
               <FormField
                 key={key}
                 control={form.control}
                 name={key}
                 render={({ field }) => (
                   <FormItem className={span ? "sm:col-span-2" : ""}>
-                    <FormLabel>{label}</FormLabel>
+                    <FormLabel aria-required={required}>{label}</FormLabel>
                     <FormControl>
                       <Input placeholder={placeholder} {...field} value={field.value ?? ""} />
                     </FormControl>
@@ -93,7 +93,7 @@ export default function ProfileEditForm({ profile, saving, successMsg, error, on
               name="tentangSaya"
               render={({ field }) => (
                 <FormItem className="sm:col-span-2">
-                  <FormLabel>Tentang Saya</FormLabel>
+                  <FormLabel aria-required>Tentang Saya</FormLabel>
                   <FormControl>
                     <Textarea
                       rows={4}

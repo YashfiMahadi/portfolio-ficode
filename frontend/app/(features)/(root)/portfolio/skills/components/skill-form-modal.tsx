@@ -56,7 +56,7 @@ export default function SkillFormModal({ editItem, saving, onClose, onSave }: Sk
               name="namaSkill"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nama Skill *</FormLabel>
+                  <FormLabel aria-required>Nama Skill</FormLabel>
                   <FormControl>
                     <Input placeholder="Contoh: Java, React, MySQL..." {...field} />
                   </FormControl>
@@ -71,21 +71,21 @@ export default function SkillFormModal({ editItem, saving, onClose, onSave }: Sk
               name="kategori"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Kategori *</FormLabel>
-                  <FormControl>
-                    <Select value={field.value} onValueChange={field.onChange}>
+                  <FormLabel aria-required>Kategori</FormLabel>
+                  <Select value={field.value} onValueChange={field.onChange}>
+                    <FormControl>
                       <SelectTrigger>
                         <SelectValue placeholder="-- Pilih Kategori --" />
                       </SelectTrigger>
-                      <SelectContent>
-                        {kategoriList.map((kategori) => (
-                          <SelectItem key={kategori} value={kategori}>
-                            {kategori}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
+                    </FormControl>
+                    <SelectContent>
+                      {kategoriList.map((kategori) => (
+                        <SelectItem key={kategori} value={kategori}>
+                          {kategori}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage />
                 </FormItem>
               )}
