@@ -17,6 +17,7 @@ import java.util.Map;
  *
  * Endpoint:
  * GET    /api/profiles        - Ambil semua profil
+ * GET    /api/profiles/public - Ambil profil admin (buat halaman publik, tanpa login)
  * GET    /api/profiles/{id}   - Ambil profil by ID
  * POST   /api/profiles        - Tambah profil baru
  * PUT    /api/profiles/{id}   - Update profil
@@ -39,6 +40,25 @@ public class ProfileController {
         response.put("data", profiles);
         response.put("total", profiles.size());
         return ResponseEntity.ok(response);
+    }
+
+    // GET profile milik admin (pemilik portfolio) -> dipakai halaman publik
+    // seperti /cv yang tidak ada konteks user login. Dicari lewat username
+    // "admin", BUKAN nebak angka userId (karena bisa beda-beda tiap instalasi).
+    @GetMapping("/public")
+    public ResponseEntity<Map<String, Object>> getPublicProfile() {
+        Map<String, Object> response = new HashMap<>();
+        return profileService.ambilProfileAdmin()
+                .map(profile -> {
+                    response.put("status", "success");
+                    response.put("data", profile);
+                    return ResponseEntity.ok(response);
+                })
+                .orElseGet(() -> {
+                    response.put("status", "empty");
+                    response.put("pesan", "Profile admin belum dibuat");
+                    return ResponseEntity.ok(response);
+                });
     }
 
     // GET profil by ID

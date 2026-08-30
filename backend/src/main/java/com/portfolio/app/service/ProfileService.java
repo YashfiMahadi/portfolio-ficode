@@ -4,6 +4,7 @@ import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
 import com.portfolio.app.entity.Profile;
 import com.portfolio.app.repository.ProfileRepository;
+import com.portfolio.app.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +16,9 @@ public class ProfileService {
 
     @Autowired
     private ProfileRepository profileRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private Cloudinary cloudinary;
@@ -70,6 +74,16 @@ public class ProfileService {
 
     public Optional<Profile> ambilProfileByUserId(Long userId) {
         return profileRepository.findByUserId(userId);
+    }
+
+    /**
+     * Ambil profile milik admin (pemilik portfolio), dicari lewat username
+     * "admin" -> bukan nebak angka ID. Dipakai halaman publik seperti /cv
+     * yang tidak punya konteks user yang sedang login.
+     */
+    public Optional<Profile> ambilProfileAdmin() {
+        return userRepository.findByUsername("admin")
+            .flatMap(admin -> profileRepository.findByUserId(admin.getId()));
     }
 
     public Optional<Profile> updateProfile(Long id, Profile profileBaru) {

@@ -47,12 +47,10 @@ export default function LandingPage() {
 
   useEffect(() => {
     Promise.all([
-      // Aplikasi ini single-admin (lihat AuthService.buatUserDefault): admin
-      // adalah user pertama yang pernah dibuat, jadi userId-nya selalu 1.
-      // Pakai /profiles/me/1 (profile milik admin), BUKAN /profiles biasa
-      // (yang balikin SEMUA baris di tabel, termasuk data contoh dari
-      // database.sql yang belum ada fotonya).
-      apiFetch("/profiles/me/1"), apiFetch("/skills"), apiFetch("/experiences"),
+      // /profiles/public: dicari backend berdasarkan username "admin",
+      // BUKAN tebak-tebak angka userId (yang ternyata beda-beda tiap
+      // instalasi). Ini profile satu-satunya pemilik portfolio ini.
+      apiFetch("/profiles/public"), apiFetch("/skills"), apiFetch("/experiences"),
       apiFetch("/educations"), apiFetch("/projects"), apiFetch("/certifications"),
     ]).then(([p, s, e, ed, pr, c]) => {
       if (p.status === "success" && p.data) setProfile(p.data);
