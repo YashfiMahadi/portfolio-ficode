@@ -51,7 +51,7 @@ public class FileUploadController {
             );
             
             // Ambil URL aman (HTTPS) dari hasil upload
-            String fileUrl = (String) uploadResult.get("url");
+            String fileUrl = (String) uploadResult.get("secure_url");
 
             response.put("status", "success");
             response.put("pesan", "Foto berhasil diupload ke folder " + folderName);

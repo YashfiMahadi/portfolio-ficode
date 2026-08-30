@@ -13,8 +13,11 @@ import java.util.Map;
  * AuthController - REST API untuk autentikasi
  *
  * Endpoint:
- * POST /api/auth/login    - Login dengan username & password
- * POST /api/auth/register - Daftar user baru
+ * POST /api/auth/login - Login dengan username & password
+ *
+ * Catatan: aplikasi ini didesain untuk 1 admin (single-tenant), bukan
+ * multi-user. Data portfolio (skill, project, dst.) bersifat global,
+ * jadi registrasi user baru sengaja tidak disediakan.
  */
 @RestController
 @RequestMapping("/api/auth")
