@@ -1,0 +1,21 @@
+# Maven / Build folders
+target/
+build/
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Application properties yang berisi rahasia (opsional jika ingin dipisah)
+# application-local.properties
