@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Navbar from "@/app/(features)/(landing)/components/navbar";
 import Footer from "@/app/(features)/(landing)/components/footer";
+import { Section } from "lucide-react";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 
@@ -46,20 +47,25 @@ export default function LandingPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    Promise.all([
+    // Pakai allSettled (bukan Promise.all biasa): kalau salah satu endpoint
+    // gagal/404, section lain yang datanya sukses tetap tampil, bukan
+    // ikutan kosong semua cuma gara-gara satu request bermasalah.
+    Promise.allSettled([
       // /profiles/public: dicari backend berdasarkan username "admin",
       // BUKAN tebak-tebak angka userId (yang ternyata beda-beda tiap
       // instalasi). Ini profile satu-satunya pemilik portfolio ini.
       apiFetch("/profiles/public"), apiFetch("/skills"), apiFetch("/experiences"),
       apiFetch("/educations"), apiFetch("/projects"), apiFetch("/certifications"),
     ]).then(([p, s, e, ed, pr, c]) => {
-      if (p.status === "success" && p.data) setProfile(p.data);
-      setSkills(s.data || []);
-      setExperiences(e.data || []);
-      setEducations(ed.data || []);
-      setProjects(pr.data || []);
-      setCertifications(c.data || []);
-    }).catch(() => {}).finally(() => setLoading(false));
+      if (p.status === "fulfilled" && p.value.status === "success" && p.value.data) {
+        setProfile(p.value.data);
+      }
+      if (s.status === "fulfilled") setSkills(s.value.data || []);
+      if (e.status === "fulfilled") setExperiences(e.value.data || []);
+      if (ed.status === "fulfilled") setEducations(ed.value.data || []);
+      if (pr.status === "fulfilled") setProjects(pr.value.data || []);
+      if (c.status === "fulfilled") setCertifications(c.value.data || []);
+    }).finally(() => setLoading(false));
   }, []);
 
   const scrollTo = (id: string) => {
@@ -86,7 +92,7 @@ export default function LandingPage() {
       <Navbar profileName={profile?.nama} />
 
       {/* HERO */}
-      <section id="hero" className="min-h-screen flex items-center pt-16">
+      <Section id="hero" className="min-h-screen flex items-center pt-16">
         <div className="mx-auto max-w-6xl px-4 w-full">
           <div className="flex flex-col-reverse md:flex-row items-center gap-12">
             <div className="flex-1">
@@ -143,10 +149,10 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* ABOUT */}
-      <section id="about" className="py-20 bg-[#1e293b]">
+      <Section id="about" className="py-20 bg-[#1e293b]">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
             <p className="text-blue-400 text-sm font-medium mb-2">Siapa Saya</p>
@@ -191,10 +197,10 @@ export default function LandingPage() {
             </div>
           </div>
         </div>
-      </section>
+      </Section>
 
       {/* SKILLS */}
-      <section id="skills" className="py-20">
+      <Section id="skills" className="py-20">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
             <p className="text-blue-400 text-sm font-medium mb-2">Apa yang Saya Kuasai</p>
@@ -226,10 +232,10 @@ export default function LandingPage() {
             </div>
           )}
         </div>
-      </section>
+      </Section>
 
       {/* PROJECTS */}
-      <section id="projects" className="py-20 bg-[#1e293b]">
+      <Section id="projects" className="py-20 bg-[#1e293b]">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
             <p className="text-blue-400 text-sm font-medium mb-2">Karya Saya</p>
@@ -291,10 +297,10 @@ export default function LandingPage() {
             </div>
           )}
         </div>
-      </section>
+      </Section>
 
       {/* EDUCATION */}
-      <section id="education" className="py-20">
+      <Section id="education" className="py-20">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
             <p className="text-blue-400 text-sm font-medium mb-2">Latar Belakang</p>
@@ -326,10 +332,10 @@ export default function LandingPage() {
             </div>
           )}
         </div>
-      </section>
+      </Section>
 
       {/* EXPERIENCE */}
-      <section id="experience" className="py-20 bg-[#1e293b]">
+      <Section id="experience" className="py-20 bg-[#1e293b]">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
             <p className="text-blue-400 text-sm font-medium mb-2">Perjalanan Karir</p>
@@ -366,10 +372,10 @@ export default function LandingPage() {
             </div>
           )}
         </div>
-      </section>
+      </Section>
 
       {/* CERTIFICATIONS */}
-      <section id="certifications" className="py-20">
+      <Section id="certifications" className="py-20">
         <div className="mx-auto max-w-6xl px-4">
           <div className="mb-12 text-center">
             <p className="text-blue-400 text-sm font-medium mb-2">Pencapaian</p>
@@ -398,10 +404,10 @@ export default function LandingPage() {
             </div>
           )}
         </div>
-      </section>
+      </Section>
 
       {/* CONTACT */}
-      <section id="contact" className="py-20 bg-[#1e293b]">
+      <Section id="contact" className="py-20 bg-[#1e293b]">
         <div className="mx-auto max-w-6xl px-4 text-center">
           <p className="text-blue-400 text-sm font-medium mb-2">Tertarik Bekerja Sama?</p>
           <h2 className="text-3xl font-bold mb-4">Hubungi Saya</h2>
@@ -437,7 +443,7 @@ export default function LandingPage() {
             )}
           </div>
         </div>
-      </section>
+      </Section>
 
       <Footer profileName={profile?.nama} />
     </div>
