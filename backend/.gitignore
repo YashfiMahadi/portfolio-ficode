@@ -1,0 +1,15 @@
+# Build & Target folders (Java / Maven)
+target/
+build/
+*.jar
+*.war
+*.ear
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+
+# Environment & Sensitive Properties files
+application.properties
+application-*.properties
