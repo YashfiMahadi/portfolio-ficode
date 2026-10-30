@@ -17,5 +17,10 @@ build/
 .DS_Store
 Thumbs.db
 
-# Application properties yang berisi rahasia (opsional jika ingin dipisah)
-# application-local.properties
+src/main/resources/application.properties
+
+application.properties
+application-dev.properties
+application-local.properties
+application-*.properties
+*.env
