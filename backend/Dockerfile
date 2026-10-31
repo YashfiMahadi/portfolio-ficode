@@ -1,14 +1,14 @@
-# Stage 1: Build aplikasi menggunakan Maven di dalam Docker
+# Stage 1: Build aplikasi menggunakan Maven bawaan sistem
 FROM eclipse-temurin:17-jdk-alpine AS build
 WORKDIR /app
 
-# Salurkan seluruh isi folder backend ke dalam container
+# Salin seluruh isi project backend
 COPY . .
 
-# Jalankan perintah package Maven untuk membuat file .jar (tanpa menjalankan tes)
-RUN ./mvnw clean package -DskipTests
+# Install maven via apk alpine, lalu jalankan build maven
+RUN apk add --no-cache maven && mvn clean package -DskipTests
 
-# Stage 2: Jalankan aplikasi menggunakan JRE yang ringan
+# Stage 2: Jalankan aplikasi
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
