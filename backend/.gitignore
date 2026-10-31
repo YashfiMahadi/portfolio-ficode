@@ -9,7 +9,3 @@ build/
 .idea/
 *.iml
 .vscode/
-
-# Environment & Sensitive Properties files
-application.properties
-application-*.properties
