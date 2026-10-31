@@ -25,7 +25,7 @@ const nextConfig: NextConfig = {
       // sebenarnya di-upload dan disimpan.
       {
         protocol: "https",
-        hostname: "portfolio-ficode-production.up.railway.app",
+        hostname: "portfolioficode-pje2r3cx.back4.app",
         pathname: "/uploads/**",
       },
       // Backend lokal, untuk development di komputer sendiri.
